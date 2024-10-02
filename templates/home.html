@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% block title %}Home - TrackQuest SD{% endblock %}
+
+{% block content %}
+    <h1>Welcome to TrackQuest SD</h1>
+    <p>Find your next 5K, Half Marathon, or Marathon event below. Whether you're a casual runner or a seasoned athlete, we've got something for you!</p>
+
+    <h2>Explore Upcoming Races</h2>
+    <p>Click below to view and filter through a list of exciting races happening in San Diego:</p>
+
+    <div class="cta">
+        <a href="{{ url_for('display_races') }}" class="btn">View Races</a>
+    </div>
+
+    <p>Can't find a race? Contact us to suggest a new race to add to the directory.</p>
+{% endblock %}

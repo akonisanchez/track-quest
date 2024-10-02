@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+
+{% block title %}Find a Race - TrackQuest SD{% endblock %}
+
+{% block content %}
+    <h1>Find a Race</h1>
+    <p>Your quest to find the perfect San Diego race begins below:</p>
+
+    <!-- Form for filtering by distance -->
+    <form method="GET" action="{{ url_for('display_races') }}">
+        <label for="distance">Filter by Distance:</label>
+        <select name="distance" id="distance">
+            <option value="">All</option>
+            {% for distance in distances %}
+                <option value="{{ distance }}" {% if selected_distance == distance %}selected{% endif %}>{{ distance }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+
+    <!-- Table to display the races -->
+    <table border="1" cellpadding="10">
+        <thead>
+            <tr>
+                <th>Race</th>
+                <th>Date</th>
+                <th>Distance(s)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for race in races %}
+                <tr class="{% if loop.index0 % 2 == 0 %}even{% else %}odd{% endif %}">
+                    <td><a href="{{ race.url }}" target="_blank">{{ race.name }}</a></td>
+                    <td>{{ race.date }}</td>
+                    <td>{{ race.distance }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="3">No races available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="navigation">
+        <a href="{{ url_for('home') }}">Back to Home</a>
+    </div>
+
+    <style>
+        /* Style for alternating row colors */
+        .even {
+            background-color: #f2f2f2; /* Light gray for even rows */
+        }
+        .odd {
+            background-color: white; /* White for odd rows */
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,108 @@
+/* Active link underline for the current page */
+.nav-list a.active {
+    text-decoration: underline;
+    font-weight: bold; /* Optional: make active link bold */
+}
+
+/* Other styles remain unchanged */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    padding-top: 20px;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+/* Navigation Bar Styles */
+header {
+    background-color: #444;
+    padding: 10px 0;
+}
+
+.nav-list {
+    list-style-type: none;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-list li {
+    margin: 0 10px;
+}
+
+.nav-list a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+/* Logo styling */
+.nav-list img {
+    height: 84px;
+    margin-right: 20px;
+    background-color: #444;
+    padding: 10px;
+}
+
+/* Adjusting logo position */
+header .nav-list {
+    padding-left: 20px;
+}
+
+/* Hover effect */
+.nav-list a:hover {
+    text-decoration: underline;
+}
+
+/* Flash message styling */
+.flash-messages {
+    margin: 20px 0;
+}
+
+.flash-messages .alert {
+    padding: 10px;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: bold;
+}
+
+.flash-messages .alert-success {
+    background-color: #4CAF50;
+}
+
+.flash-messages .alert-error {
+    background-color: #f44336;
+}

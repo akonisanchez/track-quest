@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+
+{% block title %}Contact Us - San Diego Race Finder{% endblock %}
+
+{% block content %}
+    <h1>Contact Us</h1>
+    <p>If you have any questions or feedback, feel free to reach out!</p>
+    
+    <p>For any inquiries, please email us at <a href="mailto:info@sandiegoracefinder.com">info@sandiegoracefinder.com</a>.</p>
+
+    <!-- Optional: Include a feedback form if needed -->
+    <form action="/submit_contact" method="post">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" required></textarea>
+
+        <button type="submit">Send</button>
+    </form>
+{% endblock %}

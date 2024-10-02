@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+
+{% block title %}Submit a Race - San Diego Race Finder{% endblock %}
+
+{% block content %}
+    <h1>Submit a Race</h1>
+    <form action="{{ url_for('submit_race') }}" method="POST">
+        <label for="name">Race Name:</label>
+        <input type="text" id="name" name="name" required placeholder="Enter race name"><br>
+
+        <label for="date">Race Date:</label>
+        <input type="date" id="date" name="date" required><br>
+
+        <label for="distance">Race Distance:</label>
+        <input type="text" id="distance" name="distance" required placeholder="Enter distance (e.g., 5K, Half Marathon)"><br>
+
+        <button type="submit">Submit Race</button>
+    </form>
+
+    <div class="navigation">
+        <a href="{{ url_for('races') }}">Back to Races</a>
+        <a href="{{ url_for('home') }}">Back to Home</a>
+    </div>
+{% endblock %}
