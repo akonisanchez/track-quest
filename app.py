@@ -43,10 +43,13 @@ def display_races():
     selected_distance = request.args.get('distance')  # Get selected distance from query params
 
     # Get unique distances from the loaded races
-    unique_distances = set(race['distance'] for race in races)  # Use a set to get unique distances
+    unique_distances = sorted(set(
+    distance.strip() for race in races for distance in race['distance'].split('/')  #  Split by '/' for multiple distances
+))  # Uses a set to get unique distances and sort them
 
     if selected_distance:
-        filtered_races = [race for race in races if race['distance'] == selected_distance]  # Filter by distance if provided
+        # Filter races that include the selected distance (case-insensitive)
+        filtered_races = [race for race in races if selected_distance in map(str.strip, race['distance'].split('/'))]
     else:
         filtered_races = races  # Get all races if no filter is applied
 
