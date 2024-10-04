@@ -2,6 +2,7 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
 import csv
 import os
+import datetime
 import random  # Import the random module for random race selection
 
 # Create a Flask app instance
@@ -32,6 +33,11 @@ def load_races_from_csv():
 
 # Load race data from the CSV file when the app starts
 races = load_races_from_csv()  # Load races into memory
+
+# Context processor to make current_year available in all templates
+@app.context_processor
+def inject_year():
+    return {'current_year': datetime.datetime.now().year}
 
 # Define the homepage route (URL)
 @app.route('/')
