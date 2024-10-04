@@ -46,7 +46,7 @@ a {
 
 /* Navigation Bar Styles */
 header {
-    background-color: #444;
+    background-color: #003366;
     padding: 10px 0;
 }
 
@@ -72,9 +72,10 @@ header {
 /* Logo styling */
 .nav-list img {
     height: 84px;
-    margin-right: 20px;
+    margin-right: 0px;
     background-color: #444;
-    padding: 10px;
+    padding: 0;
+    border: none;
 }
 
 /* Adjusting logo position */
