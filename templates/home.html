@@ -13,5 +13,10 @@
         <a href="{{ url_for('display_races') }}" class="btn">View Races</a>
     </div>
 
-    <p>Can't find a race? Contact us to suggest a new race to add to the directory.</p>
+    <h1>Feel like you're in shape for any distance?</h1>
+    <div class="random-race-section">
+        <a href="{{ url_for('random_race') }}" class="btn random-btn">Random Race</a>
+        <p>Click the button above to let fate choose your next race...</p>
+    </div>
+
 {% endblock %}

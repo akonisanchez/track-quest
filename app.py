@@ -1,7 +1,8 @@
 # Import necessary modules
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, redirect, url_for
 import csv
 import os
+import random  # Import the random module for random race selection
 
 # Create a Flask app instance
 app = Flask(__name__)
@@ -64,6 +65,16 @@ def about():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')  # Make sure this template exists in the templates directory
+
+# Define the random race route
+@app.route('/random_race')
+def random_race():
+    if races:
+        random_race = random.choice(races)  # Select a random race
+        return redirect(random_race['url'])  # Redirect to the random race URL
+    else:
+        flash("No races available. Please check back later.", "error")
+        return redirect(url_for('home'))  # Redirect back to the home page if no races are found
 
 # Run the Flask application
 if __name__ == '__main__':

@@ -106,3 +106,26 @@ header .nav-list {
 .flash-messages .alert-error {
     background-color: #f44336;
 }
+
+/* Random Race Button Styles */
+.random-race-section {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.random-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #FF5733; /* Cool bright color */
+    color: white;
+    font-size: 18px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.random-btn:hover {
+    background-color: #C70039; /* Darker hover color */
+}
