@@ -30,6 +30,25 @@
                         Contact Us
                     </a>
                 </li>
+                <!-- User Authentication Links -->
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('logout') }}" class="{% if request.endpoint == 'logout' %}active{% endif %}">
+                            Logout
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('login') }}" class="{% if request.endpoint == 'login' %}active{% endif %}">
+                            Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('register') }}" class="{% if request.endpoint == 'register' %}active{% endif %}">
+                            Register
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
     </header>    

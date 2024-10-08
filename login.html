@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block title %}Login - TrackQuest SD{% endblock %}
+
+{% block content %}
+    <h1>Login</h1>
+    <form method="post">
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a>.</p>
+{% endblock %}

@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
+from flask_login import login_user, logout_user, login_required, LoginManager, current_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import csv
@@ -13,7 +14,11 @@ app.secret_key = 'supersecretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///trackstar.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Initialize database and login manager
 db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # Redirect to login page if not authenticated
 
 # Define the path to the CSV file
 csv_file_path = '/Users/ajsanchez/sd_races/data/san_diego_race_data.csv'
@@ -37,11 +42,16 @@ def load_races_from_csv():
     return races
 
 # Load races into memory
-races = load_races_from_csv()  
+races = load_races_from_csv()
 
 @app.context_processor
 def inject_year():
     return {'current_year': datetime.datetime.now().year}
+
+# User loader for Flask-Login
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 @app.route('/')
 def home():
@@ -49,27 +59,20 @@ def home():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    # Check if the request method is POST, indicating a form submission
     if request.method == 'POST':
-        # Retrieve form data
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
         
-        # Create a new user instance
         new_user = User(username=username, email=email)
-        new_user.set_password(password)  # Hash the password for security
+        new_user.set_password(password)  # Hash the password
         
-        # Add the new user to the database session and commit the changes
         db.session.add(new_user)
-        db.session.commit()  # Save the user to the database
+        db.session.commit() 
         
-        # Flash a success message to the user
         flash('Registration successful!', 'success')
-        # Redirect to the home page after successful registration
         return redirect(url_for('home'))
     
-    # Render the registration template if the request method is GET
     return render_template('register.html')
 
 @app.route('/races', methods=['GET'])
@@ -100,6 +103,30 @@ def random_race():
     else:
         flash("No races available. Please check back later.", "error")
         return redirect(url_for('home'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if user and user.check_password(password):
+            login_user(user)  # Provided by Flask-Login
+            flash('Logged in successfully!', 'success')
+            return redirect(url_for('home'))
+        else:
+            flash('Invalid email or password', 'danger')  
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()  # Provided by Flask-Login
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('home'))
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
