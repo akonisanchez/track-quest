@@ -47,6 +47,31 @@ def inject_year():
 def home():
     return render_template('home.html', races=races)
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    # Check if the request method is POST, indicating a form submission
+    if request.method == 'POST':
+        # Retrieve form data
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        
+        # Create a new user instance
+        new_user = User(username=username, email=email)
+        new_user.set_password(password)  # Hash the password for security
+        
+        # Add the new user to the database session and commit the changes
+        db.session.add(new_user)
+        db.session.commit()  # Save the user to the database
+        
+        # Flash a success message to the user
+        flash('Registration successful!', 'success')
+        # Redirect to the home page after successful registration
+        return redirect(url_for('home'))
+    
+    # Render the registration template if the request method is GET
+    return render_template('register.html')
+
 @app.route('/races', methods=['GET'])
 def display_races():
     selected_distance = request.args.get('distance')  
