@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
-from flask_login import login_user, logout_user, login_required, LoginManager, current_user
+from flask_login import login_user, logout_user, login_required, LoginManager, current_user, UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import csv
@@ -8,7 +8,7 @@ import datetime
 import random
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  
+app.secret_key = 'supersecretkey'
 
 # Config for SQLite Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///trackstar.db'
@@ -128,11 +128,12 @@ def logout():
     flash('You have been logged out.', 'success')
     return redirect(url_for('home'))
 
-class User(db.Model):
+class User(db.Model, UserMixin):  # Inherit from UserMixin
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -146,8 +147,9 @@ class User(db.Model):
 # Create tables when the application starts
 with app.app_context():
     try:
-        db.create_all()
-        print("Database tables created!")
+        db.drop_all()  # Drop all existing tables
+        db.create_all()  # Recreate tables
+        print("Database tables dropped and created!")
     except Exception as e:
         print(f"Error creating tables: {e}")
 
