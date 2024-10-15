@@ -30,10 +30,17 @@
                         Contact Us
                     </a>
                 </li>
+                
                 <!-- User Authentication Links -->
                 {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <a href="{{ url_for('logout') }}" class="{% if request.endpoint == 'logout' %}active{% endif %}">
+                    <li class="nav-item welcome-item">
+                        <!-- Link to Profile Page -->
+                        <span class="welcome-section">
+                            Welcome, <a href="{{ url_for('profile') }}">{{ current_user.username }}</a>!
+                        </span>
+                    </li>
+                    <li class="nav-item logout-item">
+                        <a href="{{ url_for('logout') }}" class="random-btn">
                             Logout
                         </a>
                     </li>
@@ -51,7 +58,7 @@
                 {% endif %}
             </ul>
         </nav>
-    </header>    
+    </header> 
 
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}

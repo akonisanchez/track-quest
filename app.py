@@ -46,7 +46,10 @@ races = load_races_from_csv()
 
 @app.context_processor
 def inject_year():
-    return {'current_year': datetime.datetime.now().year}
+    return {
+        'current_year': datetime.datetime.now().year,
+        'datetime': datetime  # Add datetime to the context
+    }
 
 # User loader for Flask-Login
 @login_manager.user_loader
@@ -134,6 +137,9 @@ class User(db.Model, UserMixin):  # Inherit from UserMixin
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
+    join_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)  # Field for join date
+    about_me = db.Column(db.String(500), default='')  # Field for "about me" section
+    last_active = db.Column(db.DateTime, default=datetime.datetime.utcnow)  # Field for last active time
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -141,15 +147,33 @@ class User(db.Model, UserMixin):  # Inherit from UserMixin
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def update_last_active(self):
+        self.last_active = datetime.datetime.utcnow()  # Update last active time
+        db.session.commit()  # Save the change to the database
+
     def __repr__(self):
         return f'<User {self.username}>'
+
+@app.route('/profile')
+@login_required
+def profile():
+    current_user.update_last_active()  # Update last active time whenever the profile is accessed
+    return render_template('profile.html', user=current_user)
+
+@app.route('/update_about_me', methods=['POST'])
+@login_required
+def update_about_me():
+    about_me = request.form.get('about_me')
+    current_user.about_me = about_me[:500]  # Limit to 500 characters
+    db.session.commit()  # Save the change to the database
+    flash('About Me section updated!', 'success')
+    return redirect(url_for('profile'))
 
 # Create tables when the application starts
 with app.app_context():
     try:
-        db.drop_all()  # Drop all existing tables
-        db.create_all()  # Recreate tables
-        print("Database tables dropped and created!")
+        db.create_all()  # Create tables only, don't drop them every time
+        print("Database tables created!")
     except Exception as e:
         print(f"Error creating tables: {e}")
 

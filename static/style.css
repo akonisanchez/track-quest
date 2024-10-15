@@ -44,6 +44,15 @@ a {
     text-decoration: none;
 }
 
+/* Styling for the welcome section */
+.welcome-section {
+    text-align: center;  /* Center the welcome message */
+    color: white;        /* Make the text white */
+    font-size: 20px;     /* Adjust the font size */
+    padding: 10px 0;     /* Add some vertical padding to space it out */
+    background-color: #003366; /* Keep the background color consistent */
+}
+
 /* Navigation Bar Styles */
 header {
     background-color: #003366;
@@ -108,7 +117,7 @@ header .nav-list {
     background-color: #f44336;
 }
 
-/* Random Race Button Styles */
+/* Random Race & Logout Button Styles */
 .random-race-section {
     text-align: center;
     margin-top: 20px;
