@@ -1,27 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ user.username }}'s Profile</title>
-</head>
-<body>
-    <h1>My Profile</h1>
-    <h2>@{{ user.username }}</h2>
-    <p>Questing since {{ user.join_date.strftime('%Y') }}</p>
-    
-    <h3>About Me</h3>
-    <p>{{ user.about_me if user.about_me else "This user has not written anything about themselves yet." }}</p>
+{% extends "layout.html" %}
 
-    <h3>Last Active</h3>
-    <p>Active {{ (datetime.datetime.utcnow() - user.last_active).seconds }} seconds ago</p>
+{% block title %}{{ user.username }}'s Profile{% endblock %}
 
-    <h3>Edit About Me</h3>
-    <form method="POST" action="{{ url_for('update_about_me') }}">
-        <textarea name="about_me" maxlength="500" rows="4" cols="50">{{ user.about_me }}</textarea><br>
-        <input type="submit" value="Update">
-    </form>
-    
-    <a href="{{ url_for('logout') }}">Logout</a>
-</body>
-</html>
+{% block content %}
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <h1>{{ user.username }}'s Profile</h1>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container profile-container">
+        
+        <!-- About Me Card -->
+        <div class="about-me-card">
+            <h3>About Me</h3>
+            <p>{{ user.about_me if user.about_me else "This user has not written anything about themselves yet." }}</p>
+        </div>
+
+        <!-- Last Active Section -->
+        <div class="last-active">
+            <h3>Last Active</h3>
+            <p>Active {{ (datetime.datetime.utcnow() - user.last_active).seconds }} seconds ago</p>
+        </div>
+
+        <!-- Edit About Me Section -->
+        <div class="edit-about-me-form">
+            <h3>Edit About Me</h3>
+            <form method="POST" action="{{ url_for('update_about_me') }}">
+                <textarea name="about_me" maxlength="500" rows="4">{{ user.about_me }}</textarea><br>
+                <input type="submit" value="Update">
+            </form>
+        </div>
+    </div>
+{% endblock %}

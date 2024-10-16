@@ -140,6 +140,115 @@ header .nav-list {
     background-color: #C70039; /* Darker hover color */
 }
 
+/* Profile Page Styles */
+.profile-header {
+    text-align: center;
+    margin: 40px 0;
+    color: #333;
+}
+
+.profile-header h1 {
+    font-size: 2.5em;
+    font-weight: 600;
+    color: #222;  /* Darker shade for better contrast */
+}
+
+/* Container styling */
+.profile-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* About Me Card */
+.about-me-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.about-me-card h3 {
+    font-size: 1.4em;
+    margin-bottom: 10px;
+    color: #444;
+}
+
+.about-me-card p {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Last Active */
+.last-active {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.last-active h3 {
+    font-size: 1.4em;
+    margin-bottom: 10px;
+    color: #444;
+}
+
+.last-active p {
+    color: #666;
+    font-style: italic;
+}
+
+/* Edit About Me Section */
+.edit-about-me-form {
+    margin-top: 30px;
+}
+
+.edit-about-me-form h3 {
+    font-size: 1.4em;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+.edit-about-me-form textarea {
+    width: 100%; /* Set width to 100% of the container */
+    max-width: 100%; /* Ensure it doesn't exceed the container width */
+    box-sizing: border-box; /* Ensure padding and borders are included in the width */
+    padding: 10px; /* Reduce padding for better fit */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+    resize: vertical; /* Allow vertical resizing but not horizontal */
+}
+
+.edit-about-me-form textarea:focus {
+    border-color: #999;
+    outline: none;
+}
+
+.edit-about-me-form input[type="submit"] {
+    margin-top: 10px;
+    padding: 10px 25px;
+    background-color: #444;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.edit-about-me-form input[type="submit"]:hover {
+    background-color: #333;
+}
+
 /* Footer Styles */
 footer {
     background-color: #003366; /* Dark blue color */
