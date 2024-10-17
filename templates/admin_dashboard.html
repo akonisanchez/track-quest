@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <h1>Admin Dashboard</h1>
+
+    <!-- User Management Section -->
+    <section class="user-management">
+        <h2>User Management</h2>
+        
+        <!-- List of users with admin controls -->
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Joined</th>
+                    <th>Last Active</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.join_date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ user.last_active.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ 'Active' if user.is_active else 'Banned' }}</td>
+                    <td>
+                        {% if not user.is_admin %}
+                        <form action="{{ url_for('ban_user', user_id=user.id) }}" method="POST" style="display:inline-block;">
+                            {% if user.is_active %}
+                            <button type="submit" class="ban-btn">Ban</button>
+                            {% else %}
+                            <button type="submit" class="unban-btn">Unban</button>
+                            {% endif %}
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</div>
+{% endblock %}

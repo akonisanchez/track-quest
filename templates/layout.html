@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Setting the character encoding and responsive layout -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- The page title can be customized with a block tag so different pages can set it -->
     <title>{% block title %}TrackQuest SD{% endblock %}</title>
+    
+    <!-- Linking to a custom CSS file located in the 'static' folder -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header>
         <nav>
             <ul class="nav-list">
+                <!-- Logo links back to the home page -->
                 <li class="nav-item">
                     <a href="{{ url_for('home') }}">
                         <img src="{{ url_for('static', filename='TrackQuest_Logo_v1.png') }}" alt="TrackQuest Logo">
                     </a>
                 </li>
+                
+                <!-- Navigation links: Notice how we use request.endpoint to mark the active page -->
                 <li class="nav-item">
                     <a href="{{ url_for('display_races') }}" class="{% if request.endpoint == 'display_races' %}active{% endif %}">
                         Find a Race
@@ -30,21 +38,32 @@
                         Contact Us
                     </a>
                 </li>
-                
-                <!-- User Authentication Links -->
+
+                 <!-- Admin Dashboard Link -->
+                 {% if current_user.is_authenticated and current_user.is_admin %}
+                 <li class="nav-item">
+                     <a href="{{ url_for('admin_dashboard') }}" class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                         Admin Dashboard
+                     </a>
+                 </li>
+             {% endif %}
+
+                <!-- Authentication Links: Depending on whether the user is logged in or not -->
                 {% if current_user.is_authenticated %}
                     <li class="nav-item welcome-item">
-                        <!-- Link to Profile Page -->
+                        <!-- Friendly greeting with a link to the user's profile -->
                         <span class="welcome-section">
                             Welcome, <a href="{{ url_for('profile') }}">{{ current_user.username }}</a>!
                         </span>
                     </li>
+                    <!-- Logout option for authenticated users -->
                     <li class="nav-item logout-item">
                         <a href="{{ url_for('logout') }}" class="random-btn">
                             Logout
                         </a>
                     </li>
                 {% else %}
+                    <!-- Links to login/register for guests -->
                     <li class="nav-item">
                         <a href="{{ url_for('login') }}" class="{% if request.endpoint == 'login' %}active{% endif %}">
                             Login
@@ -60,28 +79,33 @@
         </nav>
     </header> 
 
+    <!-- Flash messages show up here (e.g., login success or form errors) -->
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="flash-messages">
+                    <!-- Loop through each flash message and display it with the appropriate style -->
                     {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">
-                            {{ message }}
-                        </div>
+                    <div class="alert {{ category }}">
+                        {{ message }}
+                    </div>                    
                     {% endfor %}
                 </div>
             {% endif %}
         {% endwith %}
     </div>
     
+    <!-- This block will be filled with the content specific to each page -->
     <div class="content">
         {% block content %}{% endblock %}
     </div>
 
+    <!-- A simple footer showing the current year -->
     <footer>
         <p>&copy; {{ current_year }} TrackQuest SD, Inc.</p>
     </footer>
 
+    <!-- Linking to custom JavaScript (if needed) -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
