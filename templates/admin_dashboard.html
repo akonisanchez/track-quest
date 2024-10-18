@@ -31,12 +31,15 @@
                     <td>{{ user.last_active.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                     <td>{{ 'Active' if user.is_active else 'Banned' }}</td>
                     <td>
+                        <!-- If the user is not an admin, allow ban/unban actions -->
                         {% if not user.is_admin %}
-                        <form action="{{ url_for('ban_user', user_id=user.id) }}" method="POST" style="display:inline-block;">
+                        <form action="{{ url_for('ban_user', user_id=user.id) }}" method="POST" style="display:inline-block;" id="ban-unban-form-{{ user.id }}">
                             {% if user.is_active %}
+                            <!-- Ban button (shown only if user is active) -->
                             <button type="submit" class="ban-btn">Ban</button>
                             {% else %}
-                            <button type="submit" class="unban-btn">Unban</button>
+                            <!-- Unban button (shown only if user is banned) -->
+                            <button type="submit" formaction="{{ url_for('unban_user', user_id=user.id) }}" class="unban-btn">Unban</button>
                             {% endif %}
                         </form>
                         {% endif %}

@@ -145,6 +145,16 @@ def ban_user(user_id):
     flash(f'User {user_to_ban.username} has been banned.', 'success')
     return redirect(url_for('admin_dashboard'))
 
+# Route to unban user
+@app.route('/unban_user/<int:user_id>', methods=['POST'])
+@admin_required
+def unban_user(user_id):
+    user_to_unban = User.query.get_or_404(user_id)
+    user_to_unban.is_active = True # Set the user to active
+    db.session.commit()
+    flash(f'User {user_to_unban.username} has been unbanned.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
 # Route for user profile
 @app.route('/profile')
 @login_required
