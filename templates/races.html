@@ -25,6 +25,7 @@
                 <th>Race</th>
                 <th>Date</th>
                 <th>Distance(s)</th>
+                <th>Action</th> <!-- New column for add race to list button -->
             </tr>
         </thead>
         <tbody>
@@ -33,6 +34,14 @@
                     <td><a href="{{ race.url }}" target="_blank">{{ race.name }}</a></td>
                     <td>{{ race.date }}</td>
                     <td>{{ race.distance }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('add_race_to_profile') }}">
+                            <input type="hidden" name="race_name" value="{{ race.name }}">
+                            <input type="hidden" name="race_date" value="{{ race.date }}">
+                            <input type="hidden" name="race_distance" value="{{ race.distance }}">
+                            <button type="submit">Add to Race List</button>
+                        </form>
+                    <td>
                 </tr>
             {% else %}
                 <tr>

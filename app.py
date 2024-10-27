@@ -185,6 +185,27 @@ def display_races():
 
     return render_template('races.html', races=filtered_races, selected_distance=selected_distance, distances=unique_distances)
 
+@app.route('/add_race_to_profile', methods=['POST'])
+@login_required
+def add_race_to_profile():
+    race_name = request.form['race_name']
+    race_date = request.form['race_date']
+    race_distance = request.form['race_distance']
+
+    # Check if the race is already in the user's list
+    existing_race = UserRace.query.filter_by(user_id=current_user.id, race_name=race_name).first()
+    if existing_race:
+        flash('This race is already in your race list.', 'info')
+        return redirect(url_for('display_races'))
+
+    # Add new race to the user's race list
+    new_race = UserRace(user_id=current_user.id, race_name=race_name, race_date=race_date, race_distance=race_distance)
+    db.session.add(new_race)
+    db.session.commit()
+
+    flash(f'{race_name} added to your race list!', 'success')
+    return redirect(url_for('display_races'))
+
 # Route for random race selection
 @app.route('/random_race')
 def random_race():
@@ -230,6 +251,34 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f'<User {self.username}>'
+
+# New table to track the races added by users
+class UserRace(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    race_name = db.Column(db.String(150), nullable=False)
+    race_date = db.Column(db.String(50), nullable=False)
+    race_distance = db.Column(db.String(50), nullable=False)
+
+    user = db.relationship('User', backref=db.backref('races', lazy=True))
+
+    def __repr__(self):
+        return f'<UserRace {self.race_name}>'
+
+@app.route('/remove_race_from_profile/<int:race_id>', methods=['POST'])
+@login_required
+def remove_race_from_profile(race_id):
+    race_to_remove = UserRace.query.get_or_404(race_id)
+
+    if race_to_remove.user_id != current_user.id:
+        flash('You are not authorized to remove this race.', 'danger')
+        return redirect(url_for('profile'))
+
+    db.session.delete(race_to_remove)
+    db.session.commit()
+
+    flash(f'{race_to_remove.race_name} has been removed from your race list.', 'success')
+    return redirect(url_for('profile'))
 
 # Create tables when the application starts
 with app.app_context():

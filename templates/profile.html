@@ -31,5 +31,23 @@
                 <input type="submit" value="Update">
             </form>
         </div>
+        
+        <!-- Race List Section -->
+        <div class="race-list">
+            <h3>My Race List</h3>
+            <ul>
+                {% for race in user.races %}
+                    <li>
+                        <strong>{{ race.race_name }}</strong> - {{ race.race_distance }} on {{ race.race_date }}
+                        <form method="POST" action="{{ url_for('remove_race_from_profile', race_id=race.id) }}">
+                            <button type="submit">Remove</button>
+                    </form>
+                    </li>
+                {% else %}
+                    <li>You have no races in your list.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    
     </div>
 {% endblock %}
