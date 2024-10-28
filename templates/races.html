@@ -35,13 +35,19 @@
                     <td>{{ race.date }}</td>
                     <td>{{ race.distance }}</td>
                     <td>
-                        <form method="POST" action="{{ url_for('add_race_to_profile') }}">
-                            <input type="hidden" name="race_name" value="{{ race.name }}">
-                            <input type="hidden" name="race_date" value="{{ race.date }}">
-                            <input type="hidden" name="race_distance" value="{{ race.distance }}">
-                            <button type="submit">Add to Race List</button>
-                        </form>
-                    <td>
+                        {% if current_user.is_authenticated %}
+                            <form method="POST" action="{{ url_for('toggle_race_in_profile') }}">
+                                <input type="hidden" name="race_name" value="{{ race.name }}">
+                                <input type="hidden" name="race_date" value="{{ race.date }}">
+                                <input type="hidden" name="race_distance" value="{{ race.distance }}">
+                                {% if race.name in user_race_names %}
+                                    <button type="submit" class="remove-button">Remove from Race List</button>
+                                {% else %}    
+                                    <button type="submit" class="add-button">Add to Race List</button>
+                                {% endif %}
+                            </form>
+                        {% endif %}
+                    </td>
                 </tr>
             {% else %}
                 <tr>

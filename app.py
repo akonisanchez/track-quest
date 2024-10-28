@@ -183,7 +183,13 @@ def display_races():
     else:
         filtered_races = races
 
-    return render_template('races.html', races=filtered_races, selected_distance=selected_distance, distances=unique_distances)
+    # Fetch races already added to current user's race list
+    user_race_names = {race.race_name for race in current_user.races} if current_user.is_authenticated else set()
+
+    # Render the races with added user race names for conditional button display
+    return render_template('races.html', races=filtered_races, selected_distance=selected_distance, distances=unique_distances, user_race_names=user_race_names)
+
+
 
 @app.route('/add_race_to_profile', methods=['POST'])
 @login_required
@@ -204,6 +210,39 @@ def add_race_to_profile():
     db.session.commit()
 
     flash(f'{race_name} added to your race list!', 'success')
+    return redirect(url_for('display_races'))
+
+# Route to toggle adding/removing a race in the user's race list
+@app.route('/toggle_race_in_profile', methods=['POST'])
+@login_required
+def toggle_race_in_profile():
+    race_name = request.form['race_name']
+    race_date = request.form['race_date']
+    race_distance = request.form['race_distance']
+
+    # Check if the race is already in the user's list
+    existing_race = UserRace.query.filter_by(
+        user_id=current_user.id, 
+        race_name=race_name
+    ).first()
+
+    if existing_race:
+        # Remove race if it exists
+        db.session.delete(existing_race)
+        db.session.commit()
+        flash(f'{race_name} removed from your race list.', 'success')
+    else:
+        # Add race if it does not exist
+        new_race = UserRace(
+            user_id=current_user.id,
+            race_name=race_name,
+            race_date=race_date,
+            race_distance=race_distance
+        )
+        db.session.add(new_race)
+        db.session.commit()
+        flash(f'{race_name} added to your race list!', 'success')
+    
     return redirect(url_for('display_races'))
 
 # Route for random race selection
