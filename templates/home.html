@@ -20,9 +20,11 @@
         <p>Click the button above to let fate choose your next race...</p>
     </div>
 
-    <!-- Registration Link Section -->
+    <!-- Registration Link Section - Only shown to non-logged in users -->
+     {% if not current_user.is_authenticated %}
     <div class="registration-section">
         <h2>Join Our Community!</h2>
         <p>Ready to take the next step? <a href="{{ url_for('register') }}">Register here</a> to become a part of our TrackQuest SD family!</p>
     </div>
+    {% endif %}
 {% endblock %}
