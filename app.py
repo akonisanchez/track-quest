@@ -298,11 +298,65 @@ class UserRace(db.Model):
     race_name = db.Column(db.String(150), nullable=False)
     race_date = db.Column(db.String(50), nullable=False)
     race_distance = db.Column(db.String(50), nullable=False)
+  # fields for race completion tracking
+    is_completed = db.Column(db.Boolean, default=False)  # Track if race is completed
+    finish_time = db.Column(db.String(20))  # Store finish time as HH:MM:SS
+    race_notes = db.Column(db.Text)  # Store race experience notes
+    completion_date = db.Column(db.DateTime)  # When the race was marked as completed
 
     user = db.relationship('User', backref=db.backref('races', lazy=True))
 
     def __repr__(self):
         return f'<UserRace {self.race_name}>'
+    
+ # Helper method to determine if race is in the future
+    def is_future_race(self):
+        """Check if race date is in the future"""
+        race_date = datetime.datetime.strptime(self.race_date, '%Y-%m-%d')
+        return race_date > datetime.datetime.now()
+
+@app.route('/mark_race_complete/<int:race_id>', methods=['POST'])
+@login_required
+def mark_race_complete(race_id):
+    """
+    Mark a race as completed and optionally add finish time and notes
+    """
+    race = UserRace.query.get_or_404(race_id)
+    
+    # Verify user owns this race
+    if race.user_id != current_user.id:
+        flash('Unauthorized access', 'danger')
+        return redirect(url_for('profile'))
+    
+    # Update race completion details
+    race.is_completed = True
+    race.completion_date = datetime.datetime.now()
+    race.finish_time = request.form.get('finish_time')
+    race.race_notes = request.form.get('race_notes')
+    
+    db.session.commit()
+    flash('Race marked as completed!', 'success')
+    return redirect(url_for('profile'))
+
+@app.route('/update_race_details/<int:race_id>', methods=['POST'])
+@login_required
+def update_race_details(race_id):
+    """
+    Update finish time and notes for a completed race
+    """
+    race = UserRace.query.get_or_404(race_id)
+    
+    # Verify user owns this race and it's completed
+    if race.user_id != current_user.id or not race.is_completed:
+        flash('Unauthorized access', 'danger')
+        return redirect(url_for('profile'))
+    
+    race.finish_time = request.form.get('finish_time')
+    race.race_notes = request.form.get('race_notes')
+    
+    db.session.commit()
+    flash('Race details updated!', 'success')
+    return redirect(url_for('profile'))
 
 @app.route('/remove_race_from_profile/<int:race_id>', methods=['POST'])
 @login_required

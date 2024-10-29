@@ -1,3 +1,4 @@
+{# Updated profile.html template #}
 {% extends "layout.html" %}
 
 {% block title %}{{ user.username }}'s Profile{% endblock %}
@@ -32,22 +33,89 @@
             </form>
         </div>
         
-        <!-- Race List Section -->
-        <div class="race-list">
-            <h3>My Race List</h3>
-            <ul>
-                {% for race in user.races %}
-                    <li>
-                        <strong>{{ race.race_name }}</strong> - {{ race.race_distance }} on {{ race.race_date }}
-                        <form method="POST" action="{{ url_for('remove_race_from_profile', race_id=race.id) }}">
-                            <button type="submit">Remove</button>
-                    </form>
-                    </li>
-                {% else %}
-                    <li>You have no races in your list.</li>
-                {% endfor %}
-            </ul>
+        <!-- Race Lists Section -->
+        <div class="race-lists">
+            <!-- Future Races Section -->
+            <div class="future-races">
+                <h3>Future Races</h3>
+                <ul class="race-list">
+                    {% for race in user.races if not race.is_completed %}
+                        <li class="race-item">
+                            <div class="race-info">
+                                <strong>{{ race.race_name }}</strong> 
+                                <span class="race-details">{{ race.race_distance }} on {{ race.race_date }}</span>
+                            </div>
+                            <div class="race-actions">
+                                <form method="POST" action="{{ url_for('mark_race_complete', race_id=race.id) }}" class="complete-form">
+                                    <label class="checkbox-container">
+                                        Race Completed?
+                                        <input type="checkbox" name="is_completed" onchange="this.form.submit()">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </form>
+                                <form method="POST" action="{{ url_for('remove_race_from_profile', race_id=race.id) }}">
+                                    <button type="submit" class="remove-btn">Remove</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li>No upcoming races.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Past Races Section -->
+            <div class="past-races">
+                <h3>Past Races</h3>
+                <ul class="race-list">
+                    {% for race in user.races if race.is_completed %}
+                        <li class="race-item">
+                            <div class="race-info">
+                                <strong>{{ race.race_name }}</strong>
+                                <span class="race-details">{{ race.race_distance }} on {{ race.race_date }}</span>
+                                {% if race.finish_time %}
+                                    <span class="finish-time">Finish Time: {{ race.finish_time }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="race-notes">
+                                {% if race.race_notes %}
+                                    <p>{{ race.race_notes }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="race-actions">
+                                <button onclick="toggleEditForm('{{ race.id }}')" class="edit-btn">Edit Details</button>
+                                <form method="POST" action="{{ url_for('remove_race_from_profile', race_id=race.id) }}">
+                                    <button type="submit" class="remove-btn">Remove</button>
+                                </form>
+                            </div>
+                            <!-- Edit Race Details Form (hidden by default) -->
+                            <div id="edit-form-{{ race.id }}" class="edit-race-form" style="display: none;">
+                                <form method="POST" action="{{ url_for('update_race_details', race_id=race.id) }}">
+                                    <div class="form-group">
+                                        <label>Finish Time (HH:MM:SS):</label>
+                                        <input type="text" name="finish_time" value="{{ race.finish_time }}" pattern="^\d{2}:\d{2}:\d{2}$">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Race Notes:</label>
+                                        <textarea name="race_notes" rows="3">{{ race.race_notes }}</textarea>
+                                    </div>
+                                    <button type="submit">Save Details</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li>No completed races yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-    
     </div>
+
+    <!-- JavaScript for toggling edit forms -->
+    <script>
+        function toggleEditForm(raceId) {
+            const form = document.getElementById(`edit-form-${raceId}`);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
 {% endblock %}

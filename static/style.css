@@ -286,6 +286,130 @@ header .nav-list {
     background-color: #4caf50;
 }
 
+/* Race Lists Styling */
+.race-lists {
+    margin-top: 30px;
+}
+
+.future-races,
+.past-races {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.race-list {
+    list-style: none;
+    padding: 0;
+}
+
+.race-item {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+}
+
+.race-item:last-child {
+    border-bottom: none;
+}
+
+.race-info {
+    margin-bottom: 10px;
+}
+
+.race-details {
+    color: #666;
+    margin-left: 10px;
+}
+
+.finish-time {
+    color: #28a745;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.race-notes {
+    font-style: italic;
+    color: #666;
+    margin: 10px 0;
+    padding-left: 10px;
+    border-left: 3px solid #eee;
+}
+
+.race-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Checkbox styling */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+}
+
+.checkbox-container input {
+    margin-right: 5px;
+}
+
+/* Form styling */
+.edit-race-form {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #444;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Button styling */
+.edit-btn,
+.remove-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.edit-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.remove-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #0056b3;
+}
+
+.remove-btn:hover {
+    background-color: #c82333;
+}
+
 /* Footer Styles */
 footer {
     background-color: #003366; 
