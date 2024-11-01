@@ -1,0 +1,132 @@
+{% extends 'layout.html' %}
+
+{% block title %}Review {{ race.name }} - TrackQuest SD{% endblock %}
+
+{% block content %}
+<div class="review-container">
+    <h1>Review {{ race.name }}</h1>
+    
+    <form method="POST" action="{{ url_for('submit_review') }}" class="review-form">
+        <!-- Race Information Section -->
+        <section class="review-section">
+            <h2>Race Information</h2>
+            <div class="form-group">
+                <label>Race Name:</label>
+                <input type="text" name="race_name" value="{{ race.name }}" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label>Race Year:</label>
+                <select name="race_year" required>
+                    {% for year in years %}
+                        <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Location:</label>
+                <input type="text" value="San Diego, CA" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label>Distance:</label>
+                <select name="distance" required>
+                    {% for distance in distances %}
+                        <option value="{{ distance }}">{{ distance }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </section>
+
+        <!-- Rating Section -->
+        <section class="review-section">
+            <h2>Rate the Race</h2>
+            
+            <div class="rating-group">
+                <div class="rating-label">
+                    <span>Overall Rating</span>
+                    <span class="rating-description">1 = Won't register again, 5 = Will run again!</span>
+                </div>
+                <div class="star-rating">
+                    {% for i in range(5, 0, -1) %}
+                        <input type="radio" id="overall-{{ i }}" name="overall_rating" value="{{ i }}" required>
+                        <label for="overall-{{ i }}">★</label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-label">
+                    <span>Course Difficulty</span>
+                    <span class="rating-description">1 = Easy/Flat, 5 = Hilly/Difficult</span>
+                </div>
+                <div class="star-rating">
+                    {% for i in range(5, 0, -1) %}
+                        <input type="radio" id="difficulty-{{ i }}" name="course_difficulty" value="{{ i }}" required>
+                        <label for="difficulty-{{ i }}">★</label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-label">
+                    <span>Course Scenery</span>
+                    <span class="rating-description">1 = No views, 5 = Aesthetic</span>
+                </div>
+                <div class="star-rating">
+                    {% for i in range(5, 0, -1) %}
+                        <input type="radio" id="scenery-{{ i }}" name="course_scenery" value="{{ i }}" required>
+                        <label for="scenery-{{ i }}">★</label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-label">
+                    <span>Race Production</span>
+                    <span class="rating-description">1 = Poorly organized, 5 = Professional</span>
+                </div>
+                <div class="star-rating">
+                    {% for i in range(5, 0, -1) %}
+                        <input type="radio" id="production-{{ i }}" name="race_production" value="{{ i }}" required>
+                        <label for="production-{{ i }}">★</label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-label">
+                    <span>Race Swag</span>
+                    <span class="rating-description">1 = Junk, 5 = Awesome toys!</span>
+                </div>
+                <div class="star-rating">
+                    {% for i in range(5, 0, -1) %}
+                        <input type="radio" id="swag-{{ i }}" name="race_swag" value="{{ i }}" required>
+                        <label for="swag-{{ i }}">★</label>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Narrative Review Section -->
+        <section class="review-section">
+            <h2>Narrative Review</h2>
+            
+            <div class="form-group">
+                <label>Review Title (50 character limit):</label>
+                <input type="text" name="review_title" maxlength="50" required>
+                <span class="char-counter">0/50</span>
+            </div>
+            
+            <div class="form-group">
+                <label>Review Details (minimum 100 characters):</label>
+                <textarea name="review_text" minlength="100" required></textarea>
+                <span class="char-counter">0/100</span>
+            </div>
+        </section>
+
+        <button type="submit" class="submit-review-btn">Submit Review</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import login_user, logout_user, login_required, LoginManager, current_user, UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Float #####
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -182,14 +183,29 @@ def display_races():
         filtered_races = [race for race in races if selected_distance in map(str.strip, race['distance'].split('/'))]
     else:
         filtered_races = races
+        
+    # Add review data to each race
+    races_with_reviews = []
+    for race in filtered_races:
+        # Get the average ratings and review count
+        avg_ratings, review_count = get_race_reviews(race['name'])
+        # Create a new dictionary with all race info plus review data
+        race_data = race.copy()
+        race_data['avg_ratings'] = avg_ratings
+        race_data['review_count'] = review_count
+        races_with_reviews.append(race_data)
 
     # Fetch races already added to current user's race list
     user_race_names = {race.race_name for race in current_user.races} if current_user.is_authenticated else set()
 
-    # Render the races with added user race names for conditional button display
-    return render_template('races.html', races=filtered_races, selected_distance=selected_distance, distances=unique_distances, user_race_names=user_race_names)
-
-
+    # Pass the enhanced race data to the template
+    return render_template(
+        'races.html',
+        races=races_with_reviews,  # Use the enhanced race data instead of filtered_races
+        selected_distance=selected_distance,
+        distances=unique_distances,
+        user_race_names=user_race_names
+    )
 
 @app.route('/add_race_to_profile', methods=['POST'])
 @login_required
@@ -308,12 +324,122 @@ class UserRace(db.Model):
 
     def __repr__(self):
         return f'<UserRace {self.race_name}>'
-    
+
  # Helper method to determine if race is in the future
     def is_future_race(self):
         """Check if race date is in the future"""
         race_date = datetime.datetime.strptime(self.race_date, '%Y-%m-%d')
         return race_date > datetime.datetime.now()
+    
+#####
+class RaceReview(db.Model):
+    """
+    Model for storing race reviews from users.
+    Each review is associated with a specific race and user.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    race_name = db.Column(db.String(150), nullable=False)
+    review_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)  # Changed this line
+    race_year = db.Column(db.Integer, nullable=False)
+    distance = db.Column(db.String(50), nullable=False)
+    location = db.Column(db.String(100), default='San Diego, CA')
+    
+    # Rating fields (1-5 scale)
+    overall_rating = db.Column(Float, nullable=False)
+    course_difficulty = db.Column(Float, nullable=False)
+    course_scenery = db.Column(Float, nullable=False)
+    race_production = db.Column(Float, nullable=False)
+    race_swag = db.Column(Float, nullable=False)
+    
+    # Review content
+    review_title = db.Column(db.String(50), nullable=False)
+    review_text = db.Column(db.Text, nullable=False)
+    
+    # Relationships
+    user = db.relationship('User', backref=db.backref('reviews', lazy=True))
+    
+    def __repr__(self):
+        return f'<RaceReview {self.race_name} by {self.user.username}>'
+####
+def get_race_reviews(race_name):
+    """
+    Get all reviews and calculate average ratings for a race.
+    Returns a tuple of (average_ratings, review_count)
+    """
+    reviews = RaceReview.query.filter_by(race_name=race_name).all()
+    if not reviews:
+        return None, 0
+    
+    avg_ratings = {
+        'overall': sum(r.overall_rating for r in reviews) / len(reviews),
+        'difficulty': sum(r.course_difficulty for r in reviews) / len(reviews),
+        'scenery': sum(r.course_scenery for r in reviews) / len(reviews),
+        'production': sum(r.race_production for r in reviews) / len(reviews),
+        'swag': sum(r.race_swag for r in reviews) / len(reviews)
+    }
+    
+    return avg_ratings, len(reviews)
+ 
+ ####
+@app.route('/review_race/<race_name>', methods=['GET'])
+@login_required
+def review_race(race_name):
+    """
+    Display the race review form for a specific race.
+    """
+    # Get race details from your races list
+    race = next((r for r in races if r['name'] == race_name), None)
+    if not race:
+        flash('Race not found.', 'error')
+        return redirect(url_for('display_races'))
+      
+       # Get distances from the race
+    distances = [d.strip() for d in race['distance'].split('/')]
+     
+       # Generate year choices (2021-2025)
+    years = range(2021, 2026)
+    
+    return render_template(
+        'review_race.html',
+        race=race,
+        distances=distances,
+        years=years
+    )
+
+####
+@app.route('/submit_review', methods=['POST'])
+@login_required
+def submit_review():
+    """
+    Handle the submission of a race review.
+    """
+    # Create new review object
+    review = RaceReview(
+        user_id=current_user.id,
+        race_name=request.form['race_name'],
+        race_year=int(request.form['race_year']),
+        distance=request.form['distance'],
+        overall_rating=float(request.form['overall_rating']),
+        course_difficulty=float(request.form['course_difficulty']),
+        course_scenery=float(request.form['course_scenery']),
+        race_production=float(request.form['race_production']),
+        race_swag=float(request.form['race_swag']),
+        review_title=request.form['review_title'],
+        review_text=request.form['review_text']
+    )
+    
+    # Validate review text length
+    if len(review.review_text) < 100:
+        flash('Review text must be at least 100 characters.', 'error')
+        return redirect(url_for('review_race', race_name=review.race_name))
+    
+    # Save review
+    db.session.add(review)
+    db.session.commit()
+    
+    flash('Your review has been submitted successfully!', 'success')
+    return redirect(url_for('display_races'))
 
 @app.route('/mark_race_complete/<int:race_id>', methods=['POST'])
 @login_required
@@ -372,6 +498,26 @@ def remove_race_from_profile(race_id):
 
     flash(f'{race_to_remove.race_name} has been removed from your race list.', 'success')
     return redirect(url_for('profile'))
+
+#####
+@app.route('/race_reviews/<race_name>')
+def race_reviews(race_name):
+    """
+    Display all reviews for a specific race.
+    """
+    reviews = RaceReview.query.filter_by(race_name=race_name)\
+                             .order_by(RaceReview.review_date.desc())\
+                             .all()
+    
+    avg_ratings, review_count = get_race_reviews(race_name)
+    
+    return render_template(
+        'race_reviews.html',
+        race_name=race_name,
+        reviews=reviews,
+        avg_ratings=avg_ratings,
+        review_count=review_count
+    )
 
 # Create tables when the application starts
 with app.app_context():

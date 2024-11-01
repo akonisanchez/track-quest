@@ -3,71 +3,143 @@
 {% block title %}Find a Race - TrackQuest SD{% endblock %}
 
 {% block content %}
-    <h1>Find a Race</h1>
-    <p>Your quest to find the perfect San Diego race begins below:</p>
+   <h1>Find a Race</h1>
+   <p>Your quest to find the perfect San Diego race begins below:</p>
 
-    <!-- Form for filtering by distance -->
-    <form method="GET" action="{{ url_for('display_races') }}">
-        <label for="distance">Filter by Distance:</label>
-        <select name="distance" id="distance">
-            <option value="">All</option>
-            {% for distance in distances %}
-                <option value="{{ distance }}" {% if selected_distance == distance %}selected{% endif %}>{{ distance }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Filter</button>
-    </form>
+   <!-- Form for filtering by distance -->
+   <form method="GET" action="{{ url_for('display_races') }}">
+       <label for="distance">Filter by Distance:</label>
+       <select name="distance" id="distance">
+           <option value="">All</option>
+           {% for distance in distances %}
+               <option value="{{ distance }}" {% if selected_distance == distance %}selected{% endif %}>{{ distance }}</option>
+           {% endfor %}
+       </select>
+       <button type="submit">Filter</button>
+   </form>
 
-    <!-- Table to display the races -->
-    <table border="1" cellpadding="10">
-        <thead>
-            <tr>
-                <th>Race</th>
-                <th>Date</th>
-                <th>Distance(s)</th>
-                <th>Action</th> <!-- New column for add race to list button -->
-            </tr>
-        </thead>
-        <tbody>
-            {% for race in races %}
-                <tr class="{% if loop.index0 % 2 == 0 %}even{% else %}odd{% endif %}">
-                    <td><a href="{{ race.url }}" target="_blank">{{ race.name }}</a></td>
-                    <td>{{ race.date }}</td>
-                    <td>{{ race.distance }}</td>
-                    <td>
-                        {% if current_user.is_authenticated %}
-                            <form method="POST" action="{{ url_for('toggle_race_in_profile') }}">
-                                <input type="hidden" name="race_name" value="{{ race.name }}">
-                                <input type="hidden" name="race_date" value="{{ race.date }}">
-                                <input type="hidden" name="race_distance" value="{{ race.distance }}">
-                                {% if race.name in user_race_names %}
-                                    <button type="submit" class="remove-button">Remove from Race List</button>
-                                {% else %}    
-                                    <button type="submit" class="add-button">Add to Race List</button>
-                                {% endif %}
-                            </form>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="3">No races available.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+   <!-- Table to display the races -->
+   <table border="1" cellpadding="10">
+       <thead>
+           <tr>
+               <th>Race</th>
+               <th>Date</th>
+               <th>Distance(s)</th>
+               <!-- New column headers for ratings and reviews -->
+               <th>Rating</th> 
+               <th>Reviews</th>
+               <th>Action</th>
+           </tr>
+       </thead>
+       <tbody>
+           {% for race in races %}
+               <tr class="{% if loop.index0 % 2 == 0 %}even{% else %}odd{% endif %}">
+                   <td><a href="{{ race.url }}" target="_blank">{{ race.name }}</a></td>
+                   <td>{{ race.date }}</td>
+                   <td>{{ race.distance }}</td>
+                   <!-- Display average rating and review count -->
+                   <td>
+                       {% if race.avg_ratings %}
+                           <div class="rating-summary">
+                               <div class="stars">★ {{ "%.1f"|format(race.avg_ratings.overall) }}</div>
+                               <div class="review-count">({{ race.review_count }} reviews)</div>
+                           </div>
+                       {% else %}
+                           <span class="no-reviews">No ratings yet</span>
+                       {% endif %}
+                   </td>
+                   <!-- Review action buttons -->
+                   <td>
+                       {% if race.review_count > 0 %}
+                           <a href="{{ url_for('race_reviews', race_name=race.name) }}" class="view-reviews-btn">View Reviews</a>
+                       {% endif %}
+                       {% if current_user.is_authenticated %}
+                           <a href="{{ url_for('review_race', race_name=race.name) }}" class="write-review-btn">Write Review</a>
+                       {% endif %}
+                   </td>
+                   <td>
+                       {% if current_user.is_authenticated %}
+                           <form method="POST" action="{{ url_for('toggle_race_in_profile') }}">
+                               <input type="hidden" name="race_name" value="{{ race.name }}">
+                               <input type="hidden" name="race_date" value="{{ race.date }}">
+                               <input type="hidden" name="race_distance" value="{{ race.distance }}">
+                               {% if race.name in user_race_names %}
+                                   <button type="submit" class="remove-button">Remove from Race List</button>
+                               {% else %}    
+                                   <button type="submit" class="add-button">Add to Race List</button>
+                               {% endif %}
+                           </form>
+                       {% endif %}
+                   </td>
+               </tr>
+           {% else %}
+               <tr>
+                   <td colspan="6">No races available.</td>
+               </tr>
+           {% endfor %}
+       </tbody>
+   </table>
 
-    <div class="navigation">
-        <a href="{{ url_for('home') }}">Back to Home</a>
-    </div>
+   <div class="navigation">
+       <a href="{{ url_for('home') }}">Back to Home</a>
+   </div>
 
-    <style>
-        /* Style for alternating row colors */
-        .even {
-            background-color: #f2f2f2; /* Light gray for even rows */
-        }
-        .odd {
-            background-color: white; /* White for odd rows */
-        }
-    </style>
+   <style>
+       /* Style for alternating row colors */
+       .even {
+           background-color: #f2f2f2; /* Light gray for even rows */
+       }
+       .odd {
+           background-color: white; /* White for odd rows */
+       }
+
+       /* Rating display styles */
+       .rating-summary {
+           display: flex;
+           align-items: center;
+           gap: 5px;
+       }
+       
+       .stars {
+           color: #ffd700; /* Gold color for star rating */
+           font-size: 1.2em;
+       }
+       
+       .review-count {
+           color: #666;
+           font-size: 0.9em;
+       }
+       
+       .no-reviews {
+           color: #999;
+           font-style: italic;
+       }
+
+       /* Review button styles */
+       .view-reviews-btn,
+       .write-review-btn {
+           display: block;
+           padding: 5px 10px;
+           margin: 5px 0;
+           border-radius: 4px;
+           text-decoration: none;
+           text-align: center;
+           font-size: 0.9em;
+       }
+
+       .view-reviews-btn {
+           background-color: #4CAF50; /* Green button for viewing reviews */
+           color: white;
+       }
+
+       .write-review-btn {
+           background-color: #2196F3; /* Blue button for writing reviews */
+           color: white;
+       }
+
+       .view-reviews-btn:hover,
+       .write-review-btn:hover {
+           opacity: 0.9; /* Subtle hover effect */
+       }
+   </style>
 {% endblock %}

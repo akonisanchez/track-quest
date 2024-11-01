@@ -1,0 +1,60 @@
+{% extends 'layout.html' %}
+
+{% block title %}Reviews for {{ race_name }} - TrackQuest SD{% endblock %}
+
+{% block content %}
+<div class="reviews-container">
+    <h1>Reviews for {{ race_name }}</h1>
+    
+    <!-- Average Ratings Display -->
+    <div class="average-ratings">
+        <h2>Overall Rating: {{ "%.1f"|format(avg_ratings.overall) }} ({{ review_count }} reviews)</h2>
+        <div class="rating-summary">
+            <div class="rating-item">
+                <span>Course Difficulty:</span>
+                <div class="stars">★ {{ "%.1f"|format(avg_ratings.difficulty) }}</div>
+            </div>
+            <div class="rating-item">
+                <span>Course Scenery:</span>
+                <div class="stars">★ {{ "%.1f"|format(avg_ratings.scenery) }}</div>
+            </div>
+            <div class="rating-item">
+                <span>Race Production:</span>
+                <div class="stars">★ {{ "%.1f"|format(avg_ratings.production) }}</div>
+            </div>
+            <div class="rating-item">
+                <span>Race Swag:</span>
+                <div class="stars">★ {{ "%.1f"|format(avg_ratings.swag) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Individual Reviews -->
+    <div class="reviews-list">
+        {% for review in reviews %}
+        <div class="review-card">
+            <div class="review-header">
+                <h3>{{ review.review_title }}</h3>
+                <div class="review-meta">
+                    <span>By {{ review.user.username }}</span>
+                    <span>{{ review.race_year }}</span>
+                    <span>{{ review.distance }}</span>
+                </div>
+            </div>
+            
+            <div class="review-ratings">
+                <span class="stars">★ {{ "%.1f"|format(review.overall_rating) }}</span>
+            </div>
+            
+            <div class="review-content">
+                {{ review.review_text }}
+            </div>
+            
+            <div class="review-date">
+                Reviewed on {{ review.review_date.strftime('%B %d, %Y') }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
