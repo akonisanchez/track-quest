@@ -1,4 +1,3 @@
-{# Updated profile.html template #}
 {% extends "layout.html" %}
 
 {% block title %}{{ user.username }}'s Profile{% endblock %}
@@ -12,10 +11,21 @@
     <!-- Main Container -->
     <div class="container profile-container">
         
-        <!-- About Me Card -->
+        <!-- About Me Section with Inline Edit -->
         <div class="about-me-card">
             <h3>About Me</h3>
-            <p>{{ user.about_me if user.about_me else "This user has not written anything about themselves yet." }}</p>
+            <div id="about-me-content">
+                <p id="about-me-text">{{ user.about_me if user.about_me else "This user has not written anything about themselves yet." }}</p>
+                <button id="edit-about-me-button" onclick="toggleEditAboutMe()" class="edit-btn">Edit</button>
+            </div>
+            
+            <!-- Hidden Inline Edit Form -->
+            <div id="about-me-edit-form" style="display: none;">
+                <form method="POST" action="{{ url_for('update_about_me') }}">
+                    <textarea id="about-me-input" name="about_me" maxlength="500" rows="4">{{ user.about_me }}</textarea><br>
+                    <button type="submit" class="edit-btn">Update</button>
+                </form>
+            </div>
         </div>
 
         <!-- Last Active Section -->
@@ -24,15 +34,6 @@
             <p>Active {{ (datetime.datetime.utcnow() - user.last_active).seconds }} seconds ago</p>
         </div>
 
-        <!-- Edit About Me Section -->
-        <div class="edit-about-me-form">
-            <h3>Edit About Me</h3>
-            <form method="POST" action="{{ url_for('update_about_me') }}">
-                <textarea name="about_me" maxlength="500" rows="4">{{ user.about_me }}</textarea><br>
-                <input type="submit" value="Update">
-            </form>
-        </div>
-        
         <!-- Race Lists Section -->
         <div class="race-lists">
             <!-- Future Races Section -->
@@ -113,6 +114,19 @@
 
     <!-- JavaScript for toggling edit forms -->
     <script>
+        function toggleEditAboutMe() {
+            const contentDiv = document.getElementById("about-me-content");
+            const editForm = document.getElementById("about-me-edit-form");
+
+            if (editForm.style.display === "none") {
+                editForm.style.display = "block";
+                contentDiv.style.display = "none";
+            } else {
+                editForm.style.display = "none";
+                contentDiv.style.display = "block";
+            }
+        }
+
         function toggleEditForm(raceId) {
             const form = document.getElementById(`edit-form-${raceId}`);
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
