@@ -21,7 +21,7 @@ app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # TODO: Move to environment variable
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///trackstar.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///trackquest_sd.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize extensions
@@ -179,11 +179,21 @@ def unban_user(user_id):
 
 # User profile routes
 @app.route('/profile')
+@app.route('/profile/<username>')
 @login_required
-def profile():
-    """Display user profile page."""
-    current_user.update_last_active()
-    return render_template('profile.html', user=current_user)
+def profile(username=None):
+    """
+    Display user profile page.
+    If username is provided, show that user's profile.
+    If no username provided, show current user's profile.
+    """
+    if username:
+        user = User.query.filter_by(username=username).first_or_404()
+    else:
+        user = current_user
+        
+    user.update_last_active()
+    return render_template('profile.html', user=user)
 
 @app.route('/update_about_me', methods=['POST'])
 @login_required
@@ -579,10 +589,11 @@ def race_reviews(race_name):
 # Database initialization
 with app.app_context():
     try:
-        db.create_all()
-        print("Database tables created!")
+        db.drop_all()  # deletes the old database
+        db.create_all()  # create a fresh database
+        print("Database tables recreated successfully!")
     except Exception as e:
-        print(f"Error creating tables: {e}")
+        print(f"Error handling tables: {e}")
 
 if __name__ == '__main__':
     app.run(debug=True, port=9090)
