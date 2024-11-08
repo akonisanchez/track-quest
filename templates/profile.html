@@ -16,16 +16,20 @@
             <h3>About Me</h3>
             <div id="about-me-content">
                 <p id="about-me-text">{{ user.about_me if user.about_me else "This user has not written anything about themselves yet." }}</p>
+                {% if current_user.id == user.id %}
                 <button id="edit-about-me-button" onclick="toggleEditAboutMe()" class="edit-btn">Edit</button>
+            {% endif %}
             </div>
             
             <!-- Hidden Inline Edit Form -->
+            {% if current_user.id == user.id %}
             <div id="about-me-edit-form" style="display: none;">
                 <form method="POST" action="{{ url_for('update_about_me') }}">
                     <textarea id="about-me-input" name="about_me" maxlength="500" rows="4">{{ user.about_me }}</textarea><br>
                     <button type="submit" class="edit-btn">Update</button>
                 </form>
             </div>
+        {% endif %}
         </div>
 
         <!-- Last Active Section -->
