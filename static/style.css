@@ -601,6 +601,82 @@ header .nav-list {
     text-align: right;
 }
 
+/* User Reviews Section Styles */
+.user-reviews {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.review-list {
+    list-style: none;
+    padding: 0;
+}
+
+.review-item {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.review-header h4 {
+    margin: 0;
+    color: #003366;
+}
+
+.race-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.race-link:hover h4 {
+    color: #005599;
+    text-decoration: underline;
+}
+
+.review-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.rating {
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.review-title {
+    margin: 10px 0;
+    color: #444;
+    font-size: 1.1em;
+}
+
+.review-excerpt {
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.no-reviews {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    font-style: italic;
+}
+
 /* Footer Styles */
 footer {
     background-color: #003366; 

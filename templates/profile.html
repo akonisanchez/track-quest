@@ -17,19 +17,19 @@
             <div id="about-me-content">
                 <p id="about-me-text">{{ user.about_me if user.about_me else "This user has not written anything about themselves yet." }}</p>
                 {% if current_user.id == user.id %}
-                <button id="edit-about-me-button" onclick="toggleEditAboutMe()" class="edit-btn">Edit</button>
-            {% endif %}
+                    <button id="edit-about-me-button" onclick="toggleEditAboutMe()" class="edit-btn">Edit</button>
+                {% endif %}
             </div>
             
             <!-- Hidden Inline Edit Form -->
             {% if current_user.id == user.id %}
-            <div id="about-me-edit-form" style="display: none;">
-                <form method="POST" action="{{ url_for('update_about_me') }}">
-                    <textarea id="about-me-input" name="about_me" maxlength="500" rows="4">{{ user.about_me }}</textarea><br>
-                    <button type="submit" class="edit-btn">Update</button>
-                </form>
-            </div>
-        {% endif %}
+                <div id="about-me-edit-form" style="display: none;">
+                    <form method="POST" action="{{ url_for('update_about_me') }}">
+                        <textarea id="about-me-input" name="about_me" maxlength="500" rows="4">{{ user.about_me }}</textarea><br>
+                        <button type="submit" class="edit-btn">Update</button>
+                    </form>
+                </div>
+            {% endif %}
         </div>
 
         <!-- Last Active Section -->
@@ -110,6 +110,32 @@
                         </li>
                     {% else %}
                         <li>No completed races yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- User Reviews Section -->
+            <div class="user-reviews">
+                <h3>Race Reviews</h3>
+                <ul class="review-list">
+                    {% for review in user.reviews %}
+                        <li class="review-item">
+                            <div class="review-header">
+                                <a href="{{ url_for('race_reviews', race_name=review.race_name) }}" class="race-link">
+                                    <h4>{{ review.race_name }}</h4>
+                                </a>
+                                <div class="review-meta">
+                                    <span class="review-date">{{ review.review_date.strftime('%B %d, %Y') }}</span>
+                                    <span class="rating">★ {{ "%.1f"|format(review.overall_rating) }}</span>
+                                </div>
+                            </div>
+                            <div class="review-content">
+                                <h5 class="review-title">{{ review.review_title }}</h5>
+                                <p class="review-excerpt">{{ review.review_text[:200] }}{% if review.review_text|length > 200 %}...{% endif %}</p>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="no-reviews">No reviews written yet.</li>
                     {% endfor %}
                 </ul>
             </div>
