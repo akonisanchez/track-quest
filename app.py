@@ -21,7 +21,7 @@ app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # TODO: Move to environment variable
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///trackquest_sd.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/ajsanchez/sd_races/instance/trackquest_sd.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize extensions
@@ -108,17 +108,24 @@ def login():
         email = request.form['email']
         password = request.form['password']
         
+        print(f"Login attempt - Email: {email}")  # Debug print
+        
         user = User.query.filter_by(email=email).first()
         
         if user:
+            print("User found in database")  # Debug print
             if not user.is_active:
+                print("User is not active")  # Debug print
                 flash('You have been banned. Please contact support.', 'ban')
                 return redirect(url_for('login'))
             
+            print(f"Checking password: {user.check_password(password)}")  # Debug print
             if user.check_password(password):
                 login_user(user)
                 flash('Logged in successfully!', 'success')
                 return redirect(url_for('home'))
+            else:
+                print("Password check failed")  # Debug print
             
         flash('Invalid email or password', 'danger')
     
@@ -589,11 +596,10 @@ def race_reviews(race_name):
 # Database initialization
 with app.app_context():
     try:
-        db.drop_all()  # deletes the old database
-        db.create_all()  # create a fresh database
-        print("Database tables recreated successfully!")
+        db.create_all()  # Only create tables if they don't exist
+        print("Database tables created!")
     except Exception as e:
-        print(f"Error handling tables: {e}")
+        print(f"Error creating tables: {e}")
 
 if __name__ == '__main__':
     app.run(debug=True, port=9090)
