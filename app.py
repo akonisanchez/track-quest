@@ -77,27 +77,44 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # Authentication route handlers
-@app.route('/')
-def home():
-    """Render home page with race listings."""
-    return render_template('home.html', races=races)
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    """Handle user registration."""
+    """
+    Handle user registration with duplicate checking.
+    
+    Validates that username and email are unique before creating new user.
+    Shows appropriate error messages if duplicates are found.
+    """
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
         
-        new_user = User(username=username, email=email)
-        new_user.set_password(password)
+        # Check for existing username
+        existing_username = User.query.filter_by(username=username).first()
+        if existing_username:
+            flash('That username is already taken. Please choose another.', 'error')
+            return redirect(url_for('register'))
+            
+        # Check for existing email
+        existing_email = User.query.filter_by(email=email).first()
+        if existing_email:
+            flash('An account with that email already exists. Please use a different email.', 'error')
+            return redirect(url_for('register'))
         
-        db.session.add(new_user)
-        db.session.commit()
-        
-        flash('Registration successful!', 'success')
-        return redirect(url_for('home'))
+        # If we get here, username and email are unique
+        try:
+            new_user = User(username=username, email=email)
+            new_user.set_password(password)
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Registration successful! Please log in.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            # Handle any other potential database errors
+            db.session.rollback()
+            flash('An error occurred during registration. Please try again.', 'error')
+            return redirect(url_for('register'))
     
     return render_template('register.html')
 
@@ -334,6 +351,15 @@ def about():
 def contact():
     """Display the contact page."""
     return render_template('contact.html')
+
+@app.route('/')
+@app.route('/home')  # Adding an additional route path
+def home():
+    """
+    Render home page with race listings.
+    Accessible via both root URL ('/') and '/home'
+    """
+    return render_template('home.html', races=races)
 
 # Database Models
 class User(db.Model, UserMixin):

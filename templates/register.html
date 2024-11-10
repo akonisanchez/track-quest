@@ -1,13 +1,33 @@
 {% extends "layout.html" %}
 
-    {% block title %}Register{% endblock %}
+{% block title %}Register{% endblock %}
 
 {% block content %}
-    <h1>Register</h1>
-    <form method="post">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Register</button>
-    </form>
+    <div class="register-container">
+        <h1>Register</h1>
+        
+        <!-- Enhanced error display -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="post" class="register-form">
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            <div class="form-group">
+                <input type="email" name="email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="register-btn">Register</button>
+        </form>
+    </div>
 {% endblock %}
