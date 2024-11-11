@@ -832,6 +832,21 @@ header .nav-list {
     margin-top: 40px;
 }
 
+.race-date {
+    background-color: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 10px 0;
+    color: #495057;
+    font-size: 0.9em;
+    display: inline-block;
+}
+
+.race-date:before {
+    content: "📅";  /* Calendar emoji */
+    margin-right: 5px;
+}
+
 /* Footer Styles */
 footer {
     background-color: #003366; 
