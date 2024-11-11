@@ -470,21 +470,21 @@ class UserRace(db.Model):
 class HistoricalRace(db.Model):
     """
     Model to store historical race information that persists even after races are removed from CSV.
-    This ensures reviews remain valid even when races are no longer in the active race list.
     
     Attributes:
         id (int): Primary key
         name (str): Name of the race
         location (str): Race location (defaults to San Diego)
+        race_date (str): Date when the race took place
         created_at (datetime): When this record was created
         reviews (relationship): One-to-many relationship with RaceReview model
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False, unique=True)
     location = db.Column(db.String(100), default='San Diego, CA')
+    race_date = db.Column(db.String(50))  # New field to store race date
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     
-    # Establish one-to-many relationship with reviews
     reviews = db.relationship('RaceReview', backref='historical_race', lazy=True)
 
     def __repr__(self):
@@ -529,20 +529,26 @@ class RaceReview(db.Model):
     def __repr__(self):
         return f'<RaceReview {self.historical_race.name} by {self.user.username}>'
 
-def get_or_create_historical_race(race_name):
+def get_or_create_historical_race(race_name, race_date=None):
     """
     Gets existing historical race record or creates new one if it doesn't exist.
+    Now includes race date preservation.
     
     Args:
         race_name (str): Name of the race
+        race_date (str): Date when the race takes place
         
     Returns:
         HistoricalRace: The historical race record
     """
     historical_race = HistoricalRace.query.filter_by(name=race_name).first()
     if not historical_race:
-        historical_race = HistoricalRace(name=race_name)
+        historical_race = HistoricalRace(name=race_name, race_date=race_date)
         db.session.add(historical_race)
+        db.session.commit()
+    elif race_date and not historical_race.race_date:
+        # Update existing record with date if it's missing
+        historical_race.race_date = race_date
         db.session.commit()
     return historical_race
 
