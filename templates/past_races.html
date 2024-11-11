@@ -13,6 +13,13 @@
                 <div class="race-card">
                     <h2>{{ item.race.name }}</h2>
                     
+                    <!-- Add race date display -->
+                    {% if item.race.race_date %}
+                    <div class="race-date">
+                        Race Date: {{ item.race.race_date }}
+                    </div>
+                    {% endif %}
+                    
                     {% if item.avg_ratings %}
                         <div class="rating-summary">
                             <div class="overall-rating">
