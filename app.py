@@ -692,10 +692,15 @@ def remove_race_from_profile(race_id):
 
 @app.route('/race_reviews/<race_name>')
 def race_reviews(race_name):
-    """Display all reviews for a specific race."""
+    """
+    Display all reviews for a specific race.
+    Now properly queries and orders reviews by date.
+    """
     historical_race = HistoricalRace.query.filter_by(name=race_name).first_or_404()
     
-    reviews = historical_race.reviews\
+    # Create a query for reviews instead of accessing relationship directly
+    reviews = RaceReview.query\
+        .filter_by(historical_race_id=historical_race.id)\
         .order_by(RaceReview.review_date.desc())\
         .all()
     
