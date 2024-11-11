@@ -361,6 +361,36 @@ def home():
     """
     return render_template('home.html', races=races)
 
+@app.route('/past-races')
+def past_races():
+    """
+    Display all historical races that have reviews but are no longer in the active races list.
+    Orders races by most recently reviewed.
+    """
+    # Get all historical races that have reviews
+    historical_races = (HistoricalRace.query
+        .join(RaceReview)  # Only get races that have reviews
+        .group_by(HistoricalRace.id)  # Group by race to avoid duplicates
+        .order_by(db.func.max(RaceReview.review_date).desc())  # Order by most recent review
+        .all())
+    
+    # For each race, get its review stats
+    races_with_stats = []
+    for race in historical_races:
+        # Skip if race is in current active races list
+        if any(r['name'] == race.name for r in races):
+            continue
+            
+        avg_ratings, review_count = get_race_reviews(race.name)
+        races_with_stats.append({
+            'race': race,
+            'avg_ratings': avg_ratings,
+            'review_count': review_count,
+            'latest_review': max(r.review_date for r in race.reviews)
+        })
+    
+    return render_template('past_races.html', races=races_with_stats)
+
 # Database Models
 class User(db.Model, UserMixin):
     """
@@ -437,6 +467,29 @@ class UserRace(db.Model):
     def __repr__(self):
         return f'<UserRace {self.race_name}>'
 
+class HistoricalRace(db.Model):
+    """
+    Model to store historical race information that persists even after races are removed from CSV.
+    This ensures reviews remain valid even when races are no longer in the active race list.
+    
+    Attributes:
+        id (int): Primary key
+        name (str): Name of the race
+        location (str): Race location (defaults to San Diego)
+        created_at (datetime): When this record was created
+        reviews (relationship): One-to-many relationship with RaceReview model
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False, unique=True)
+    location = db.Column(db.String(100), default='San Diego, CA')
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    
+    # Establish one-to-many relationship with reviews
+    reviews = db.relationship('RaceReview', backref='historical_race', lazy=True)
+
+    def __repr__(self):
+        return f'<HistoricalRace {self.name}>'
+
 class RaceReview(db.Model):
     """
     Model for storing user reviews and ratings of races.
@@ -457,11 +510,10 @@ class RaceReview(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    race_name = db.Column(db.String(150), nullable=False)
+    historical_race_id = db.Column(db.Integer, db.ForeignKey('historical_race.id'), nullable=False)
     review_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     race_year = db.Column(db.Integer, nullable=False)
     distance = db.Column(db.String(50), nullable=False)
-    location = db.Column(db.String(100), default='San Diego, CA')
     
     overall_rating = db.Column(Float, nullable=False)
     course_difficulty = db.Column(Float, nullable=False)
@@ -475,12 +527,29 @@ class RaceReview(db.Model):
     user = db.relationship('User', backref=db.backref('reviews', lazy=True))
 
     def __repr__(self):
-        return f'<RaceReview {self.race_name} by {self.user.username}>'
+        return f'<RaceReview {self.historical_race.name} by {self.user.username}>'
+
+def get_or_create_historical_race(race_name):
+    """
+    Gets existing historical race record or creates new one if it doesn't exist.
+    
+    Args:
+        race_name (str): Name of the race
+        
+    Returns:
+        HistoricalRace: The historical race record
+    """
+    historical_race = HistoricalRace.query.filter_by(name=race_name).first()
+    if not historical_race:
+        historical_race = HistoricalRace(name=race_name)
+        db.session.add(historical_race)
+        db.session.commit()
+    return historical_race
 
 # Review-related functions and routes
 def get_race_reviews(race_name):
     """
-    Calculate average ratings and review count for a race.
+    Calculate average ratings and review count for a race using historical race record.
     
     Args:
         race_name (str): Name of the race
@@ -488,7 +557,11 @@ def get_race_reviews(race_name):
     Returns:
         tuple: (average_ratings dict, review_count int)
     """
-    reviews = RaceReview.query.filter_by(race_name=race_name).all()
+    historical_race = HistoricalRace.query.filter_by(name=race_name).first()
+    if not historical_race:
+        return None, 0
+    
+    reviews = historical_race.reviews
     if not reviews:
         return None, 0
     
@@ -524,10 +597,15 @@ def review_race(race_name):
 @app.route('/submit_review', methods=['POST'])
 @login_required
 def submit_review():
-    """Handle race review submission."""
+    """Handle race review submission with historical race preservation."""
+    # Get or create historical race record
+    race_name = request.form['race_name']
+    historical_race = get_or_create_historical_race(race_name)
+    
+    # Create the review
     review = RaceReview(
         user_id=current_user.id,
-        race_name=request.form['race_name'],
+        historical_race_id=historical_race.id,  # Use historical_race_id instead of race_name
         race_year=int(request.form['race_year']),
         distance=request.form['distance'],
         overall_rating=float(request.form['overall_rating']),
@@ -541,7 +619,7 @@ def submit_review():
     
     if len(review.review_text) < 100:
         flash('Review text must be at least 100 characters.', 'error')
-        return redirect(url_for('review_race', race_name=review.race_name))
+        return redirect(url_for('review_race', race_name=race_name))
     
     db.session.add(review)
     db.session.commit()
@@ -605,9 +683,11 @@ def remove_race_from_profile(race_id):
 @app.route('/race_reviews/<race_name>')
 def race_reviews(race_name):
     """Display all reviews for a specific race."""
-    reviews = RaceReview.query.filter_by(race_name=race_name)\
-                             .order_by(RaceReview.review_date.desc())\
-                             .all()
+    historical_race = HistoricalRace.query.filter_by(name=race_name).first_or_404()
+    
+    reviews = historical_race.reviews\
+        .order_by(RaceReview.review_date.desc())\
+        .all()
     
     avg_ratings, review_count = get_race_reviews(race_name)
     
