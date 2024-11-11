@@ -604,14 +604,18 @@ def review_race(race_name):
 @login_required
 def submit_review():
     """Handle race review submission with historical race preservation."""
-    # Get or create historical race record
+    # Get race details from current races list
     race_name = request.form['race_name']
-    historical_race = get_or_create_historical_race(race_name)
+    current_race = next((r for r in races if r['name'] == race_name), None)
+    race_date = current_race['date'] if current_race else None
+    
+    # Get or create historical race record with date
+    historical_race = get_or_create_historical_race(race_name, race_date)
     
     # Create the review
     review = RaceReview(
         user_id=current_user.id,
-        historical_race_id=historical_race.id,  # Use historical_race_id instead of race_name
+        historical_race_id=historical_race.id,
         race_year=int(request.form['race_year']),
         distance=request.form['distance'],
         overall_rating=float(request.form['overall_rating']),
