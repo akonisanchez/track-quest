@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+
+{% block title %}Past Races - TrackQuest SD{% endblock %}
+
+{% block content %}
+<div class="past-races-container">
+    <h1>Past Race Reviews</h1>
+    <p>View reviews for races that have already taken place.</p>
+
+    {% if races %}
+        <div class="race-grid">
+            {% for item in races %}
+                <div class="race-card">
+                    <h2>{{ item.race.name }}</h2>
+                    
+                    {% if item.avg_ratings %}
+                        <div class="rating-summary">
+                            <div class="overall-rating">
+                                <span class="stars">★ {{ "%.1f"|format(item.avg_ratings.overall) }}</span>
+                                <span class="review-count">({{ item.review_count }} reviews)</span>
+                            </div>
+                            
+                            <div class="rating-details">
+                                <div class="rating-item">
+                                    <span>Course Difficulty:</span>
+                                    <span class="stars">★ {{ "%.1f"|format(item.avg_ratings.difficulty) }}</span>
+                                </div>
+                                <div class="rating-item">
+                                    <span>Scenery:</span>
+                                    <span class="stars">★ {{ "%.1f"|format(item.avg_ratings.scenery) }}</span>
+                                </div>
+                                <div class="rating-item">
+                                    <span>Production:</span>
+                                    <span class="stars">★ {{ "%.1f"|format(item.avg_ratings.production) }}</span>
+                                </div>
+                                <div class="rating-item">
+                                    <span>Swag:</span>
+                                    <span class="stars">★ {{ "%.1f"|format(item.avg_ratings.swag) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="race-actions">
+                            <a href="{{ url_for('race_reviews', race_name=item.race.name) }}" class="btn view-reviews">
+                                Read {{ item.review_count }} Reviews
+                            </a>
+                            {% if current_user.is_authenticated %}
+                                <a href="{{ url_for('review_race', race_name=item.race.name) }}" class="btn write-review">
+                                    Write a Review
+                                </a>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="last-reviewed">
+                            Last reviewed: {{ item.latest_review.strftime('%B %d, %Y') }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-races">No past races with reviews found.</p>
+    {% endif %}
+</div>
+{% endblock %}

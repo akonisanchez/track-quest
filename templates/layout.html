@@ -29,6 +29,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ url_for('past_races') }}" class="{% if request.endpoint == 'past_races' %}active{% endif %}">
+                        Past Races
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">
                         About
                     </a>
