@@ -201,6 +201,34 @@ def unban_user(user_id):
     flash(f'User {user_to_unban.username} has been unbanned.', 'success')
     return redirect(url_for('admin_dashboard'))
 
+# Admin review deletion route
+@app.route('/delete_review/<int:review_id>', methods=['POST'])
+@admin_required  # Reusing existing admin_required decorator
+def delete_review(review_id):
+    """
+    Admin route to delete a review by its ID.
+    Only accessible to admin users.
+    
+    Args:
+        review_id (int): ID of the review to delete
+        
+    Returns:
+        Redirect to the previous page with success/error message
+    """
+    review = RaceReview.query.get_or_404(review_id)
+    race_name = review.historical_race.name
+    
+    try:
+        db.session.delete(review)
+        db.session.commit()
+        flash('Review successfully deleted.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error deleting review.', 'error')
+        
+    # Return to the race reviews page
+    return redirect(url_for('race_reviews', race_name=race_name))
+
 # User profile routes
 @app.route('/profile')
 @app.route('/profile/<username>')
