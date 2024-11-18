@@ -45,7 +45,7 @@
             <div class="review-header">
                 <h3>{{ review.review_title }}</h3>
                 <div class="review-meta">
-                    <span>By {{ review.user.username }}</span>
+                    <span>By <a href="{{ url_for('profile', username=review.user.username) }}" class="user-profile-link">{{ review.user.username }}</a></span>
                     <span>{{ review.race_year }}</span>
                     <span>{{ review.distance }}</span>
                 </div>
