@@ -173,6 +173,19 @@ header .nav-list {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* User Profile Link Styling */
+.user-profile-link {
+    color: #003366;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.user-profile-link:hover {
+    color: #005599;
+    text-decoration: underline;
+}
+
 /* About Me Card */
 .about-me-card {
     background-color: white;
