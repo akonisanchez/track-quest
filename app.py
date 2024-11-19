@@ -14,6 +14,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Float
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from functools import wraps
 
 # Application initialization
@@ -23,6 +24,17 @@ app.secret_key = 'supersecretkey'  # TODO: Move to environment variable
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/ajsanchez/sd_races/instance/trackquest_sd.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# File Upload Configuration
+UPLOAD_FOLDER = os.path.join('static', 'race_images')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max-limit
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+
+# Create upload folder if it doesn't exist
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Initialize extensions
 db = SQLAlchemy(app)
@@ -60,6 +72,20 @@ def load_races_from_csv():
                 'url': row['URL']
             })
     return races
+
+def allowed_file(filename):
+    """
+    Check if uploaded file has an allowed extension.
+    """
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def generate_unique_filename(original_filename):
+    """
+    Generate a unique filename using timestamp.
+    """
+    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    secure_name = secure_filename(original_filename)
+    return f"{timestamp}_{secure_name}"
 
 # Preload race data
 races = load_races_from_csv()
@@ -203,22 +229,21 @@ def unban_user(user_id):
 
 # Admin review deletion route
 @app.route('/delete_review/<int:review_id>', methods=['POST'])
-@admin_required  # Reusing existing admin_required decorator
+@admin_required
 def delete_review(review_id):
-    """
-    Admin route to delete a review by its ID.
-    Only accessible to admin users.
-    
-    Args:
-        review_id (int): ID of the review to delete
-        
-    Returns:
-        Redirect to the previous page with success/error message
-    """
+    """Admin route to delete a review and its associated image."""
     review = RaceReview.query.get_or_404(review_id)
     race_name = review.historical_race.name
     
     try:
+        # Delete associated image file if it exists
+        if review.image_filename:
+            try:
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], review.image_filename))
+            except:
+                # Continue with review deletion even if image deletion fails
+                pass
+        
         db.session.delete(review)
         db.session.commit()
         flash('Review successfully deleted.', 'success')
@@ -226,7 +251,6 @@ def delete_review(review_id):
         db.session.rollback()
         flash('Error deleting review.', 'error')
         
-    # Return to the race reviews page
     return redirect(url_for('race_reviews', race_name=race_name))
 
 # User profile routes
@@ -551,7 +575,7 @@ class RaceReview(db.Model):
     
     review_title = db.Column(db.String(50), nullable=False)
     review_text = db.Column(db.Text, nullable=False)
-    
+    image_filename = db.Column(db.String(255))  # Store uploaded image filename
     user = db.relationship('User', backref=db.backref('reviews', lazy=True))
 
     def __repr__(self):
@@ -631,38 +655,67 @@ def review_race(race_name):
 @app.route('/submit_review', methods=['POST'])
 @login_required
 def submit_review():
-    """Handle race review submission with historical race preservation."""
-    # Get race details from current races list
+    """Handle race review submission with image upload capability."""
     race_name = request.form['race_name']
     current_race = next((r for r in races if r['name'] == race_name), None)
     race_date = current_race['date'] if current_race else None
     
-    # Get or create historical race record with date
+    # Handle image upload
+    image_filename = None
+    if 'race_image' in request.files:
+        file = request.files['race_image']
+        if file and file.filename != '':
+            if not allowed_file(file.filename):
+                flash('Invalid file type. Please upload PNG, JPG, JPEG, or GIF files.', 'error')
+                return redirect(url_for('review_race', race_name=race_name))
+            
+            try:
+                filename = generate_unique_filename(file.filename)
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)
+                image_filename = filename
+            except Exception as e:
+                flash('Error uploading image. Please try again.', 'error')
+                return redirect(url_for('review_race', race_name=race_name))
+
+    # Get or create historical race record
     historical_race = get_or_create_historical_race(race_name, race_date)
     
     # Create the review
-    review = RaceReview(
-        user_id=current_user.id,
-        historical_race_id=historical_race.id,
-        race_year=int(request.form['race_year']),
-        distance=request.form['distance'],
-        overall_rating=float(request.form['overall_rating']),
-        course_difficulty=float(request.form['course_difficulty']),
-        course_scenery=float(request.form['course_scenery']),
-        race_production=float(request.form['race_production']),
-        race_swag=float(request.form['race_swag']),
-        review_title=request.form['review_title'],
-        review_text=request.form['review_text']
-    )
+    try:
+        review = RaceReview(
+            user_id=current_user.id,
+            historical_race_id=historical_race.id,
+            race_year=int(request.form['race_year']),
+            distance=request.form['distance'],
+            overall_rating=float(request.form['overall_rating']),
+            course_difficulty=float(request.form['course_difficulty']),
+            course_scenery=float(request.form['course_scenery']),
+            race_production=float(request.form['race_production']),
+            race_swag=float(request.form['race_swag']),
+            review_title=request.form['review_title'],
+            review_text=request.form['review_text'],
+            image_filename=image_filename
+        )
+        
+        if len(review.review_text) < 100:
+            flash('Review text must be at least 100 characters.', 'error')
+            return redirect(url_for('review_race', race_name=race_name))
+        
+        db.session.add(review)
+        db.session.commit()
+        flash('Your review has been submitted successfully!', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash('Error submitting review. Please try again.', 'error')
+        if image_filename:
+            # Clean up uploaded file if review creation fails
+            try:
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+            except:
+                pass
     
-    if len(review.review_text) < 100:
-        flash('Review text must be at least 100 characters.', 'error')
-        return redirect(url_for('review_race', race_name=race_name))
-    
-    db.session.add(review)
-    db.session.commit()
-    
-    flash('Your review has been submitted successfully!', 'success')
     return redirect(url_for('display_races'))
 
 # Race completion routes

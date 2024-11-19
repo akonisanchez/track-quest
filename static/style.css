@@ -545,6 +545,113 @@ header .nav-list {
     background-color: #002244;
 }
 
+/* Image upload and display styles for reviews */
+.file-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    background-color: white;
+}
+
+.image-preview-container {
+    max-width: 300px;
+    margin: 10px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.upload-preview {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.help-text {
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+/* Review image display styles */
+.review-image {
+    margin: 15px 0;
+    text-align: center;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.race-review-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.race-review-image:hover {
+    transform: scale(1.02);
+}
+
+/* Modal styles for image enlargement */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    padding-top: 50px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    overflow: auto;
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90vh;
+    object-fit: contain;
+}
+
+.modal-close {
+    position: absolute;
+    right: 35px;
+    top: 15px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.modal-close:hover {
+    color: #bbb;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+    .modal-content {
+        max-width: 95%;
+    }
+    
+    .modal-close {
+        right: 20px;
+        top: 10px;
+        font-size: 30px;
+    }
+    
+    .image-preview-container {
+        max-width: 100%;
+    }
+}
+
 /* Reviews Display Page */
 .reviews-container {
     max-width: 800px;

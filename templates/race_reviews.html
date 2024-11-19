@@ -58,6 +58,15 @@
             <div class="review-content">
                 {{ review.review_text }}
             </div>
+
+            {% if review.image_filename %}
+            <div class="review-image">
+                <img src="{{ url_for('static', filename='race_images/' + review.image_filename) }}" 
+                     alt="Race image for {{ review.historical_race.name }}"
+                     class="race-review-image"
+                     onclick="showFullImage(this.src)">
+            </div>
+            {% endif %}
             
             <div class="review-date">
                 Reviewed on {{ review.review_date.strftime('%B %d, %Y') }}
@@ -76,4 +85,24 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="modal" onclick="this.style.display='none'">
+    <span class="modal-close">&times;</span>
+    <img class="modal-content" id="modalImage">
+</div>
+
+<script>
+    function showFullImage(src) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        modal.style.display = "block";
+        modalImg.src = src;
+    }
+
+    // Close modal when clicking the X
+    document.querySelector('.modal-close').onclick = function() {
+        document.getElementById('imageModal').style.display = "none";
+    }
+</script>
 {% endblock %}

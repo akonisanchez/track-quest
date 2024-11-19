@@ -6,7 +6,7 @@
 <div class="review-container">
     <h1>Review {{ race.name }}</h1>
     
-    <form method="POST" action="{{ url_for('submit_review') }}" class="review-form">
+    <form method="POST" action="{{ url_for('submit_review') }}" class="review-form" enctype="multipart/form-data">
         <!-- Race Information Section -->
         <section class="review-section">
             <h2>Race Information</h2>
@@ -109,6 +109,18 @@
             </div>
         </section>
 
+        <!-- Image Upload Section -->
+        <section class="review-section">
+            <h2>Share Your Race Memory</h2>
+            <div class="form-group">
+                <label for="race_image">Upload Race Photo (Optional):</label>
+                <input type="file" name="race_image" id="race_image" accept="image/*" class="file-input">
+                <div class="file-preview" id="imagePreview"></div>
+                <p class="help-text">Share a photo of your race swag, medal, or memorable moment! <br>
+                   Supported formats: PNG, JPG, JPEG, GIF (Max size: 16MB)</p>
+            </div>
+        </section>
+
         <!-- Narrative Review Section -->
         <section class="review-section">
             <h2>Narrative Review</h2>
@@ -129,4 +141,34 @@
         <button type="submit" class="submit-review-btn">Submit Review</button>
     </form>
 </div>
+
+<script>
+    // Preview uploaded image before submission
+    document.getElementById('race_image').addEventListener('change', function(e) {
+        const preview = document.getElementById('imagePreview');
+        const file = e.target.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `
+                    <div class="image-preview-container">
+                        <img src="${e.target.result}" alt="Preview" class="upload-preview">
+                    </div>`;
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.innerHTML = '';
+        }
+    });
+
+    // Existing character counter JavaScript
+    document.querySelector('input[name="review_title"]').addEventListener('input', function() {
+        this.nextElementSibling.textContent = `${this.value.length}/50`;
+    });
+
+    document.querySelector('textarea[name="review_text"]').addEventListener('input', function() {
+        this.nextElementSibling.textContent = `${this.value.length}/100`;
+    });
+</script>
 {% endblock %}
