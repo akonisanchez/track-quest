@@ -797,14 +797,15 @@ header .nav-list {
     font-style: italic;
 }
 
-/* Admin review deletion button styles */
+/* Review deletion controls for users and admins */
+.review-user-actions,
 .review-admin-actions {
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px solid #eee;
 }
 
-.delete-review-btn {
+.review-user-actions .delete-review-btn {
     background-color: #dc3545;
     color: white;
     border: none;
@@ -812,9 +813,10 @@ header .nav-list {
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    transition: background-color 0.2s ease;
 }
 
-.delete-review-btn:hover {
+.review-user-actions .delete-review-btn:hover {
     background-color: #c82333;
 }
 

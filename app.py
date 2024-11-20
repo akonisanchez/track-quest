@@ -253,6 +253,36 @@ def delete_review(review_id):
         
     return redirect(url_for('race_reviews', race_name=race_name))
 
+@app.route('/delete_own_review/<int:review_id>', methods=['POST'])
+@login_required
+def delete_own_review(review_id):
+    """Allow users to delete their own reviews."""
+    review = RaceReview.query.get_or_404(review_id)
+    
+    # Verify the review belongs to the current user
+    if review.user_id != current_user.id:
+        flash('You can only delete your own reviews.', 'error')
+        return redirect(url_for('race_reviews', race_name=review.historical_race.name))
+    
+    race_name = review.historical_race.name
+    
+    try:
+        # Delete associated image if it exists
+        if review.image_filename:
+            try:
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], review.image_filename))
+            except:
+                pass
+                
+        db.session.delete(review)
+        db.session.commit()
+        flash('Your review has been deleted.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error deleting review.', 'error')
+        
+    return redirect(url_for('race_reviews', race_name=race_name))
+
 # User profile routes
 @app.route('/profile')
 @app.route('/profile/<username>')
