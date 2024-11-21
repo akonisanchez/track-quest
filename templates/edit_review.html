@@ -1,0 +1,181 @@
+{% extends 'layout.html' %}
+
+{% block title %}Edit Review for {{ review.historical_race.name }} - TrackQuest SD{% endblock %}
+
+{% block content %}
+<div class="review-container">
+    <h1>Edit Review for {{ review.historical_race.name }}</h1>
+    
+    <form method="POST" action="{{ url_for('edit_review', review_id=review.id) }}" class="review-form" enctype="multipart/form-data">
+        <!-- Race Information Section -->
+        <section class="review-section">
+            <h2>Race Information</h2>
+            <div class="form-group">
+                <label>Race Name:</label>
+                <input type="text" value="{{ review.historical_race.name }}" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label>Race Year:</label>
+                <select name="race_year" required>
+                    {% for year in years %}
+                        <option value="{{ year }}" {% if year == review.race_year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Distance:</label>
+                <select name="distance" required>
+                    {% for distance in distances %}
+                        <option value="{{ distance }}" {% if distance == review.distance %}selected{% endif %}>{{ distance }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </section>
+
+        <!-- Rating Section -->
+        <section class="review-section">
+            <h2>Update Ratings</h2>
+            
+            <div class="rating-group">
+                <div class="rating-label">
+                    <span>Overall Rating</span>
+                    <span class="rating-description">1 = Won't register again, 5 = Will run again!</span>
+                </div>
+                <div class="star-rating">
+                    {% for i in range(5, 0, -1) %}
+                        <input type="radio" id="overall-{{ i }}" name="overall_rating" value="{{ i }}" 
+                               {% if i == review.overall_rating|round|int %}checked{% endif %} required>
+                        <label for="overall-{{ i }}">★</label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-label">
+                    <span>Course Difficulty</span>
+                    <span class="rating-description">1 = Easy/Flat, 5 = Hilly/Difficult</span>
+                </div>
+                <div class="star-rating">
+                    {% for i in range(5, 0, -1) %}
+                        <input type="radio" id="difficulty-{{ i }}" name="course_difficulty" value="{{ i }}"
+                               {% if i == review.course_difficulty|round|int %}checked{% endif %} required>
+                        <label for="difficulty-{{ i }}">★</label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-label">
+                    <span>Course Scenery</span>
+                    <span class="rating-description">1 = No views, 5 = Aesthetic</span>
+                </div>
+                <div class="star-rating">
+                    {% for i in range(5, 0, -1) %}
+                        <input type="radio" id="scenery-{{ i }}" name="course_scenery" value="{{ i }}"
+                               {% if i == review.course_scenery|round|int %}checked{% endif %} required>
+                        <label for="scenery-{{ i }}">★</label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-label">
+                    <span>Race Production</span>
+                    <span class="rating-description">1 = Poorly organized, 5 = Professional</span>
+                </div>
+                <div class="star-rating">
+                    {% for i in range(5, 0, -1) %}
+                        <input type="radio" id="production-{{ i }}" name="race_production" value="{{ i }}"
+                               {% if i == review.race_production|round|int %}checked{% endif %} required>
+                        <label for="production-{{ i }}">★</label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-label">
+                    <span>Race Swag</span>
+                    <span class="rating-description">1 = Junk, 5 = Awesome toys!</span>
+                </div>
+                <div class="star-rating">
+                    {% for i in range(5, 0, -1) %}
+                        <input type="radio" id="swag-{{ i }}" name="race_swag" value="{{ i }}"
+                               {% if i == review.race_swag|round|int %}checked{% endif %} required>
+                        <label for="swag-{{ i }}">★</label>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Image Upload Section -->
+        <section class="review-section">
+            <h2>Update Race Photo</h2>
+            <div class="form-group">
+                <label for="race_image">Upload New Race Photo (Optional):</label>
+                <input type="file" name="race_image" id="race_image" accept="image/*" class="file-input">
+                {% if review.image_filename %}
+                    <div class="current-image">
+                        <p>Current Image:</p>
+                        <img src="{{ url_for('static', filename='race_images/' + review.image_filename) }}" 
+                             alt="Current race image" class="review-image-preview">
+                    </div>
+                {% endif %}
+                <div class="file-preview" id="imagePreview"></div>
+                <p class="help-text">Share a photo of your race swag, medal, or memorable moment!<br>
+                   Supported formats: PNG, JPG, JPEG, GIF (Max size: 16MB)</p>
+            </div>
+        </section>
+
+        <!-- Narrative Review Section -->
+        <section class="review-section">
+            <h2>Update Review Text</h2>
+            
+            <div class="form-group">
+                <label>Review Title (50 character limit):</label>
+                <input type="text" name="review_title" maxlength="50" value="{{ review.review_title }}" required>
+                <span class="char-counter">{{ review.review_title|length }}/50</span>
+            </div>
+            
+            <div class="form-group">
+                <label>Review Details (minimum 100 characters):</label>
+                <textarea name="review_text" minlength="100" required>{{ review.review_text }}</textarea>
+                <span class="char-counter">{{ review.review_text|length }}/100</span>
+            </div>
+        </section>
+
+        <button type="submit" class="submit-review-btn">Update Review</button>
+    </form>
+</div>
+
+<script>
+    // Function to preview new image before upload
+    document.getElementById('race_image').addEventListener('change', function(e) {
+        const preview = document.getElementById('imagePreview');
+        const file = e.target.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `
+                    <div class="image-preview-container">
+                        <img src="${e.target.result}" alt="Preview" class="upload-preview">
+                    </div>`;
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.innerHTML = '';
+        }
+    });
+
+    // Function to update character counters
+    document.querySelector('input[name="review_title"]').addEventListener('input', function() {
+        this.nextElementSibling.textContent = `${this.value.length}/50`;
+    });
+
+    document.querySelector('textarea[name="review_text"]').addEventListener('input', function() {
+        this.nextElementSibling.textContent = `${this.value.length}/100`;
+    });
+</script>
+{% endblock %}
