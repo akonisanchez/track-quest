@@ -86,6 +86,9 @@
                 </div>
             {% elif current_user.is_authenticated and current_user.id == review.user_id %}
                 <div class="review-user-actions">
+                    {# Edit button for review owners #}
+                    <a href="{{ url_for('edit_review', review_id=review.id) }}" class="edit-review-btn">Edit Review</a>
+                    {# Delete form for review owners #}
                     <form action="{{ url_for('delete_own_review', review_id=review.id) }}" 
                           method="POST" 
                           onsubmit="return confirm('Are you sure you want to delete your review?');">
