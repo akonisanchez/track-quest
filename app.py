@@ -748,6 +748,97 @@ def submit_review():
     
     return redirect(url_for('display_races'))
 
+@app.route('/edit_review/<int:review_id>', methods=['GET', 'POST'])
+@login_required
+def edit_review(review_id):
+    """
+    Handle editing of existing race reviews.
+    
+    Allows users to modify their previously submitted race reviews including:
+    - Basic race information (year, distance)
+    - Rating scores (overall, difficulty, scenery, production, swag)
+    - Review content (title, text)
+    - Race photos
+    
+    Security:
+    - Requires user authentication
+    - Validates review ownership
+    - Validates file uploads
+    
+    Args:
+        review_id (int): Database ID of the review to edit
+    
+    Returns:
+        On GET: Rendered edit form with existing review data
+        On POST: Redirects to race review page on success or back to edit form on error
+    
+    Raises:
+        404: If review_id doesn't exist
+        403: If user tries to edit another user's review
+    """
+    review = RaceReview.query.get_or_404(review_id)
+    
+    # Security check for review ownership
+    if review.user_id != current_user.id:
+        flash('You can only edit your own reviews.', 'error')
+        return redirect(url_for('race_reviews', race_name=review.historical_race.name))
+    
+    if request.method == 'POST':
+        try:
+            # Handle image upload if provided
+            new_image = request.files.get('race_image')
+            if new_image and new_image.filename:
+                if not allowed_file(new_image.filename):
+                    flash('Invalid file type. Please upload PNG, JPG, JPEG, or GIF files.', 'error')
+                    return redirect(url_for('edit_review', review_id=review_id))
+                
+                # Remove old image if it exists
+                if review.image_filename:
+                    old_image_path = os.path.join(app.config['UPLOAD_FOLDER'], review.image_filename)
+                    if os.path.exists(old_image_path):
+                        os.remove(old_image_path)
+                
+                # Save new image
+                filename = generate_unique_filename(new_image.filename)
+                new_image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                review.image_filename = filename
+
+            # Update review data
+            review.race_year = int(request.form['race_year'])
+            review.distance = request.form['distance']
+            review.review_title = request.form['review_title']
+            review.review_text = request.form['review_text']
+            review.overall_rating = float(request.form['overall_rating'])
+            review.course_difficulty = float(request.form['course_difficulty'])
+            review.course_scenery = float(request.form['course_scenery'])
+            review.race_production = float(request.form['race_production'])
+            review.race_swag = float(request.form['race_swag'])
+
+            # Validate review text length
+            if len(review.review_text) < 100:
+                flash('Review text must be at least 100 characters.', 'error')
+                return redirect(url_for('edit_review', review_id=review_id))
+
+            db.session.commit()
+            flash('Your review has been updated successfully!', 'success')
+            return redirect(url_for('race_reviews', race_name=review.historical_race.name))
+
+        except Exception as e:
+            db.session.rollback()
+            flash('Error updating review. Please try again.', 'error')
+            return redirect(url_for('edit_review', review_id=review_id))
+
+    # For GET requests, prepare form data
+    distances = review.historical_race.race_date.split('/') if review.historical_race.race_date else []
+    years = range(2021, 2026)
+    
+    return render_template(
+        'edit_review.html',
+        review=review,
+        distances=distances,
+        years=years
+    )
+
 # Race completion routes
 @app.route('/mark_race_complete/<int:race_id>', methods=['POST'])
 @login_required

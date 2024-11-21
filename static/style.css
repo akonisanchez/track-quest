@@ -652,6 +652,22 @@ header .nav-list {
     }
 }
 
+/* Image preview styles for edit form */
+.current-image {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.review-image-preview {
+    max-width: 300px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: block;
+    margin: 10px 0;
+}
+
 /* Reviews Display Page */
 .reviews-container {
     max-width: 800px;
@@ -819,6 +835,27 @@ header .nav-list {
 .review-user-actions .delete-review-btn:hover {
     background-color: #c82333;
 }
+
+/* Review editing controls */
+.review-user-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.edit-review-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.edit-review-btn:hover {
+    background-color: #0056b3;
+    color: white;
+    text-decoration: none;
 
 /* No Reviews Message */
 .no-reviews-message {
