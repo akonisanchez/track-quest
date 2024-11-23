@@ -829,7 +829,8 @@ def edit_review(review_id):
             return redirect(url_for('edit_review', review_id=review_id))
 
     # For GET requests, prepare form data
-    distances = review.historical_race.race_date.split('/') if review.historical_race.race_date else []
+    race_data = next((r for r in races if r['name'] == review.historical_race.name), None)
+    distances = [d.strip() for d in race_data['distance'].split('/')] if race_data else []
     years = range(2021, 2026)
     
     return render_template(
