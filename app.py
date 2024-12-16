@@ -5,7 +5,7 @@ import datetime
 import random
 
 # Third-party imports
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, jsonify, render_template, request, flash, redirect, url_for
 from flask_login import (
     login_user, logout_user, login_required, LoginManager, 
     current_user, UserMixin
@@ -472,6 +472,45 @@ def past_races():
         })
     
     return render_template('past_races.html', races=races_with_stats)
+
+@app.route('/api/past-races', methods=['GET'])
+def get_past_races():
+    """
+    API endpoint that returns past race data for React component.
+    Returns formatted JSON of past races with their reviews and ratings.
+    """
+    try:
+        historical_races = (HistoricalRace.query
+            .join(RaceReview)
+            .group_by(HistoricalRace.id)
+            .order_by(db.func.max(RaceReview.review_date).desc())
+            .all())
+        
+        races_data = []
+        for race in historical_races:
+            # Skip if race is in current races list
+            if any(r['name'] == race.name for r in races):
+                continue
+                
+            avg_ratings, review_count = get_race_reviews(race.name)
+            if avg_ratings:
+                races_data.append({
+                    'name': race.name,
+                    'averageRating': float(avg_ratings['overall']),  # Ensure it's a float
+                    'reviewCount': review_count,
+                    'ratings': {
+                        'difficulty': float(avg_ratings['difficulty']),
+                        'scenery': float(avg_ratings['scenery']),
+                        'production': float(avg_ratings['production']),
+                        'swag': float(avg_ratings['swag'])
+                    },
+                    'lastReviewed': max(r.review_date for r in race.reviews).isoformat()
+                })
+        
+        return jsonify(races_data)
+    except Exception as e:
+        print(f"Error in API: {str(e)}")  # Debug print
+        return jsonify({'error': str(e)}), 500  # Return error with 500 status code
 
 # Database Models
 class User(db.Model, UserMixin):
