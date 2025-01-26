@@ -56,7 +56,7 @@ TrackQuest SD is a web application that helps runners discover and review races 
 
 1. Clone the repository
 ```bash
-git clone [your-repo-url]
+git clone [https://github.com/akonisanchez/track-quest.git]
 ```
 
 2. Create and activate virtual environment
