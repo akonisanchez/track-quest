@@ -9,3 +9,18 @@ venv/
 
 # Compiled Python files
 *.pyc
+logs/
+instance/trackquest_sd_backup.db
+check_schema.py
+migrate_review_data.py
+migrate_reviews.py
+__pycache__/
+*.pyc
+venv/
+instance/trackquest_sd_backup.db
+check_schema.py
+migrate_review_data.py
+migrate_reviews.py
+__pycache__/
+*.pyc
+venv/
