@@ -1,0 +1,200 @@
+#react-past-races {
+    width: 100%;
+}
+
+#react-past-races .past-races-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#react-past-races .hero-section {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #003366 0%, #004080 100%);
+    border-radius: 15px;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+#react-past-races .hero-section h1 {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+#react-past-races .hero-section p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.2rem;
+}
+
+#react-past-races .race-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    padding: 20px 0;
+}
+
+#react-past-races .race-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+#react-past-races .race-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+#react-past-races .race-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+#react-past-races .race-header h2 {
+    font-size: 1.4rem;
+    color: #003366;
+    margin: 0;
+    font-weight: 600;
+}
+
+#react-past-races .overall-rating {
+    background: #f8f9fa;
+    padding: 8px 15px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#react-past-races .star {
+    color: #ffd700;
+    font-size: 1.2rem;
+}
+
+#react-past-races .review-count {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+#react-past-races .rating-bars {
+    margin: 20px 0;
+}
+
+#react-past-races .rating-bar-item {
+    margin: 15px 0;
+}
+
+#react-past-races .rating-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #444;
+    font-weight: 500;
+}
+
+#react-past-races .rating-progress {
+    background: #f0f0f0;
+    height: 8px;
+    border-radius: 4px;
+    position: relative;
+    margin-right: 35px;
+}
+
+#react-past-races .rating-fill {
+    background: linear-gradient(90deg, #3498db, #2980b9);
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+#react-past-races .rating-value {
+    position: absolute;
+    right: -35px;
+    top: -7px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+#react-past-races .card-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+#react-past-races .read-btn,
+#react-past-races .write-btn {
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    flex: 1;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+#react-past-races .read-btn {
+    background: #003366;
+    color: white;
+}
+
+#react-past-races .read-btn:hover {
+    background: #004080;
+}
+
+#react-past-races .write-btn {
+    background: white;
+    border: 2px solid #003366;
+    color: #003366;
+}
+
+#react-past-races .write-btn:hover {
+    background: #f8f9fa;
+}
+
+#react-past-races .last-reviewed {
+    margin-top: 15px;
+    padding-top: 15px;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: right;
+    border-top: 1px solid #f0f0f0;
+}
+
+#react-past-races .loading,
+#react-past-races .error,
+#react-past-races .no-races {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.1rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+}
+
+@media (max-width: 768px) {
+    #react-past-races .race-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    #react-past-races .overall-rating {
+        align-self: flex-start;
+    }
+
+    #react-past-races .hero-section {
+        padding: 30px 15px;
+    }
+
+    #react-past-races .hero-section h1 {
+        font-size: 2rem;
+    }
+}

@@ -48,5 +48,5 @@ for page_num in range(1, 5):  # Adjust if necessary
 
 # Save the data to a DataFrame and CSV
 df = pd.DataFrame(races)
-df.to_csv('data/san_diego_race_data.csv', index=False)  # Save as CSV
+df.to_csv('san_diego_race_data.csv', index=False)  # Save as CSV
 print("Data saved to data/san_diego_race_data.csv")
