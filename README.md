@@ -5,17 +5,22 @@ TrackQuest SD is a web application that helps runners discover and review races 
 ![Home](static/home.png)
 
 ## Tech Stack
-
 ### Backend
-- Python/Flask
-- SQLite
-- SQLAlchemy ORM
+- Python/Flask - RESTful API development
+- SQLite - Database management
+- SQLAlchemy ORM - Database modeling and migrations
+- Flask-Login - User authentication
+- Werkzeug - Security and password hashing
+- Flask-Migrate - Database migrations
+- Pandas - Data processing
+- BeautifulSoup4 - Web scraping race data
 
 ### Frontend
-- HTML/CSS
-- JavaScript
-- React (for Past Races page)
-- Jinja2 Templates
+- HTML/CSS - Responsive design
+- JavaScript - Dynamic interactions
+- React - Interactive Past Races page
+- Jinja2 - Template engine
+- TailwindCSS - Utility-first CSS
 
 ## Features
 
@@ -61,7 +66,7 @@ git clone [https://github.com/akonisanchez/track-quest.git]
 
 2. Create and activate virtual environment
 ```bash
-python -m venv venv
+python -m venv venv (might need to do 'python3')
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
@@ -70,23 +75,12 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Set up environment variables
+4. Run the application
 ```bash
-export FLASK_APP=app.py
-export FLASK_ENV=development
+python app.py (might need to do 'python3')
 ```
 
-5. Initialize database
-```bash
-flask db upgrade
-```
-
-6. Run the application
-```bash
-flask run
-```
-
-Access the application at `http://localhost:5000`
+Access the application at `http://localhost:9090`
 
 ## Usage
 
