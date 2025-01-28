@@ -17,12 +17,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 # Application initialization
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # TODO: Move to environment variable
+app.secret_key = 'djsourmilk'  # TODO: Move to environment variable
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/ajsanchez/sd_races/instance/trackquest_sd.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'trackquest_sd.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # File Upload Configuration
@@ -44,7 +46,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 # Configuration constants
-CSV_FILE_PATH = '/Users/ajsanchez/sd_races/data/san_diego_race_data.csv'
+CSV_FILE_PATH = os.path.join(basedir, 'data', 'san_diego_race_data.csv')
 
 def load_races_from_csv():
     """
