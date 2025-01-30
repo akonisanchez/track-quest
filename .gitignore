@@ -25,3 +25,5 @@ __pycache__/
 *.pyc
 venv/
 .env
+*.db
+Instance/*.db
