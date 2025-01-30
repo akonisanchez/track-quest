@@ -24,3 +24,4 @@ migrate_reviews.py
 __pycache__/
 *.pyc
 venv/
+.env

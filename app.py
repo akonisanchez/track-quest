@@ -1,6 +1,7 @@
 # Standard library imports
 import csv
 import os
+from os import environ 
 import datetime
 import random
 
@@ -16,12 +17,15 @@ from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
+from dotenv import load_dotenv
+
+load_dotenv() # Load environment vairbales
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Application initialization
 app = Flask(__name__)
-app.secret_key = 'djsourmilk'  # TODO: Move to environment variable
+app.secret_key = environ.get('FLASK_SECRET_KEY')
 
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'trackquest_sd.db')
