@@ -118,7 +118,7 @@ Access the application at `http://localhost:9090`
 
 ![Add Race List](static/add_race_list.gif)
 
--Update your performance as you complete each race
+- Update your performance as you complete each race
 
 ![Update Race Performance](static/update_race_performance.gif)
 
