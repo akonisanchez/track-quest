@@ -466,7 +466,6 @@ def past_races():
 def get_past_races():
     """
     API endpoint that returns past race data for React component.
-    Returns formatted JSON of past races with their reviews and ratings.
     """
     try:
         historical_races = (HistoricalRace.query
@@ -497,9 +496,8 @@ def get_past_races():
                 })
         
         return jsonify(races_data)
-    except Exception as e:
-        print(f"Error in API: {str(e)}")  # Debug print
-        return jsonify({'error': str(e)}), 500  # Return error with 500 status code
+    except Exception:
+        return jsonify({'error': 'An error occurred processing your request'}), 500  
 
 # Database Models
 class User(db.Model, UserMixin):
