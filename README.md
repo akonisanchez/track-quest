@@ -61,7 +61,7 @@ TrackQuest SD is a web application that helps runners discover and review races 
 
 1. Clone the repository
 ```bash
-git clone [https://github.com/akonisanchez/track-quest.git]
+git clone https://github.com/akonisanchez/track-quest.git
 ```
 
 2. Create and activate virtual environment
@@ -75,9 +75,30 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Run the application
+4. Create a .env file in the root directory:
+```bash
+# Create a file named '.env' and add this line:
+FLASK_SECRET_KEY='paste_a_random_32_character_string_here'
+
+# You can generate a random string by running this command:
+openssl rand -hex 16
+FLASK_SECRET_KEY='your_generated_secret_key_here'
+```
+
+5. Initialize the database
+```bash
+flask db upgrade
+```
+
+6. Run the application
 ```bash
 python app.py (might need to do 'python3')
+```
+
+7. To update the race listings (optional)
+```bash
+cd data
+python scrape_races.py (might need to do 'python3')
 ```
 
 Access the application at `http://localhost:9090`
