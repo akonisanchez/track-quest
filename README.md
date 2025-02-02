@@ -82,7 +82,7 @@ FLASK_SECRET_KEY='paste_a_random_32_character_string_here'
 
 # You can generate a random string by running this command:
 openssl rand -hex 16
-FLASK_SECRET_KEY='your_generated_secret_key_here'
+Copy that generated random string and place as the secret key in the line above
 ```
 
 5. Initialize the database
