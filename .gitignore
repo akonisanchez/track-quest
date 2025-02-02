@@ -26,4 +26,4 @@ __pycache__/
 venv/
 .env
 *.db
-Instance/*.db
+Instance/*.dbmigrations/
