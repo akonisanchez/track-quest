@@ -1,0 +1,132 @@
+{% extends 'layout.html' %}
+
+{% block title %}Race History - TrackQuest SD{% endblock %}
+
+{% block content %}
+<div class="race-history-container">
+    <h1>Race Review History</h1>
+    
+    <!-- Filter Form -->
+    <div class="filter-section">
+        <form method="GET" action="{{ url_for('race_history') }}" class="filter-form">
+            <div class="filter-group">
+                <label for="race">Race:</label>
+                <select name="race" id="race">
+                    <option value="">All Races</option>
+                    {% for race in race_names %}
+                    <option value="{{ race }}" {% if current_filters.race == race %}selected{% endif %}>
+                        {{ race }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="distance">Distance:</label>
+                <select name="distance" id="distance">
+                    <option value="">All Distances</option>
+                    {% for distance in distances %}
+                    <option value="{{ distance }}" {% if current_filters.distance == distance %}selected{% endif %}>
+                        {{ distance }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="year">Year:</label>
+                <select name="year" id="year">
+                    <option value="">All Years</option>
+                    {% for year in years %}
+                    <option value="{{ year }}" {% if current_filters.year == year %}selected{% endif %}>
+                        {{ year }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="sort">Sort By:</label>
+                <select name="sort" id="sort">
+                    <option value="newest" {% if current_filters.sort == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if current_filters.sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    <option value="highest" {% if current_filters.sort == 'highest' %}selected{% endif %}>Highest Rated</option>
+                    <option value="lowest" {% if current_filters.sort == 'lowest' %}selected{% endif %}>Lowest Rated</option>
+                </select>
+            </div>
+
+            <button type="submit" class="filter-submit">Apply Filters</button>
+        </form>
+    </div>
+
+    <!-- Reviews List -->
+    <div class="reviews-list">
+        {% for review in reviews.items %}
+        <div class="review-card">
+            <div class="review-header">
+                <h2>{{ review.race_name }}</h2>
+                <div class="review-meta">
+                    <span class="distance">{{ review.distance }}</span>
+                    <span class="year">{{ review.race_year }}</span>
+                    <span class="rating">★ {{ "%.1f"|format(review.overall_rating) }}</span>
+                </div>
+            </div>
+            
+            <div class="review-details">
+                <h3>{{ review.review_title }}</h3>
+                <p class="review-text">{{ review.review_text }}</p>
+                
+                <div class="rating-details">
+                    <div class="rating-item">
+                        <span>Course Difficulty:</span>
+                        <span class="stars">★ {{ "%.1f"|format(review.course_difficulty) }}</span>
+                    </div>
+                    <div class="rating-item">
+                        <span>Scenery:</span>
+                        <span class="stars">★ {{ "%.1f"|format(review.course_scenery) }}</span>
+                    </div>
+                    <div class="rating-item">
+                        <span>Production:</span>
+                        <span class="stars">★ {{ "%.1f"|format(review.race_production) }}</span>
+                    </div>
+                    <div class="rating-item">
+                        <span>Swag:</span>
+                        <span class="stars">★ {{ "%.1f"|format(review.race_swag) }}</span>
+                    </div>
+                </div>
+                
+                <div class="review-footer">
+                    <span class="reviewer">Reviewed by {{ review.user.username }}</span>
+                    <span class="review-date">{{ review.review_date.strftime('%B %d, %Y') }}</span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="no-reviews">
+            <p>No reviews found matching your criteria.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="pagination">
+        {% if current_page > 1 %}
+        <a href="{{ url_for('race_history', page=current_page-1, **current_filters) }}" class="page-link">&laquo; Previous</a>
+        {% endif %}
+        
+        {% for page_num in range(1, total_pages + 1) %}
+        {% if page_num == current_page %}
+        <span class="current-page">{{ page_num }}</span>
+        {% else %}
+        <a href="{{ url_for('race_history', page=page_num, **current_filters) }}" class="page-link">{{ page_num }}</a>
+        {% endif %}
+        {% endfor %}
+        
+        {% if current_page < total_pages %}
+        <a href="{{ url_for('race_history', page=current_page+1, **current_filters) }}" class="page-link">Next &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

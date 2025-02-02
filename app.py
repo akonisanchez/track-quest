@@ -64,7 +64,7 @@ def load_races_from_csv():
             - url: Race website URL
     """
     if not os.path.exists(CSV_FILE_PATH):
-        print("CSV file not found. Please check the file path.")
+        flash('Error: Race data file not found', 'error')
         return []
 
     races = []
@@ -155,29 +155,12 @@ def login():
     """Handle user login with ban check."""
     if request.method == 'POST':
         email = request.form['email']
-        password = request.form['password']
-        
-        print(f"Login attempt - Email: {email}")  # Debug print
-        
+        password = request.form['password']        
         user = User.query.filter_by(email=email).first()
-        
-        if user:
-            print("User found in database")  # Debug print
-            if not user.is_active:
-                print("User is not active")  # Debug print
-                flash('You have been banned. Please contact support.', 'ban')
-                return redirect(url_for('login'))
-            
-            print(f"Checking password: {user.check_password(password)}")  # Debug print
-            if user.check_password(password):
-                login_user(user)
-                flash('Logged in successfully!', 'success')
-                return redirect(url_for('home'))
-            else:
-                print("Password check failed")  # Debug print
-            
+        if user and user.check_password(password):
+            login_user(user)
+            return redirect(url_for('home'))
         flash('Invalid email or password', 'danger')
-    
     return render_template('login.html')
 
 @app.route('/logout')
