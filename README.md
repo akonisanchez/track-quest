@@ -4,6 +4,10 @@ TrackQuest SD is a web application that helps runners discover and review races 
 
 ![Home](static/home.png)
 
+## Inspiration
+
+As a former collegiate cross country and track runner trying to rediscover my stride, I found myself frustrated by the scattered nature of race information in San Diego. TrackQuest SD was born from this personal pain point - I wanted a single hub where local runners could not only discover upcoming races but also learn from others' experiences. Think of it as Yelp, but for running events. I drew from my own running background to identify what matters most in race selection: course details, production quality, and yes, even the swag bags! I also reached out to local run clubs to ensure TrackQuest addressed their needs too. This first iteration represents my vision of what I wish existed when I started running in San Diego - a community-powered platform that makes the journey from sign-up to finish line more informed and connected.
+
 ## Tech Stack
 ### Backend
 - Python/Flask - RESTful API development
